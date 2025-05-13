@@ -7,8 +7,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ParkingLots {
 
     @Id
@@ -21,4 +27,11 @@ public class ParkingLots {
 
     private int totalCount;
     private int availableCount;
+
+    @Builder
+    public ParkingLots(Attractions attraction, int totalCount, int availableCount) {
+        this.attraction = attraction;
+        this.totalCount = totalCount;
+        this.availableCount = availableCount;
+    }
 }
