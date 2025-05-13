@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
 
     // 4xx
-    INVALID_REQUEST(HttpStatus.BAD_REQUEST, "INVALID_REQUEST");
+    INVALID_REQUEST(HttpStatus.BAD_REQUEST, "INVALID_REQUEST"),
+    INVALID_INPUT(HttpStatus.BAD_REQUEST, "INVALID_INPUT");
 
     private final HttpStatus status;
     private final String code;
