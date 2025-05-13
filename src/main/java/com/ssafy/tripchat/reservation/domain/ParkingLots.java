@@ -26,12 +26,13 @@ public class ParkingLots {
     private Attractions attraction;
 
     private int totalCount;
-    private int availableCount;
+
+    // TODO: 낙관적 락 추가예정
 
     @Builder
-    public ParkingLots(Attractions attraction, int totalCount, int availableCount) {
+    public ParkingLots(Attractions attraction, int totalCount) {
         this.attraction = attraction;
         this.totalCount = totalCount;
-        this.availableCount = availableCount;
     }
+
 }
