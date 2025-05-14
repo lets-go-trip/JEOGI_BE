@@ -11,11 +11,11 @@ public class UserResponse {
     private String name;
     private String email;
     // private List<String> roles;
-    
+
     public static UserResponse from(Members member) {
         return new UserResponse(
-                member.getId(),
-            member.getName(), member.getEmail()
+                member.getUsername(),
+                member.getNickname(), member.getEmail()
         );
     }
 }

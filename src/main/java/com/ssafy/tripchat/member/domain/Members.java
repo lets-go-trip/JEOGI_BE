@@ -21,7 +21,7 @@ public class Members {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int no;
+    private int id;
 
     @Column(nullable = false)
     private String password;
@@ -30,9 +30,9 @@ public class Members {
     private String email;
 
     @Column(unique = true, nullable = false)
-    private String id;
+    private String username;
 
     @Column
-    private String name;
+    private String nickname;
 
 }

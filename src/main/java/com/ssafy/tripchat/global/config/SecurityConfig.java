@@ -1,5 +1,7 @@
 package com.ssafy.tripchat.global.config;
 
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -15,8 +17,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 
 @EnableWebSecurity
 @Configuration
@@ -24,39 +24,39 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final UserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-      http.csrf(csrf -> csrf.disable()).httpBasic(httpBasicSpec -> httpBasicSpec.disable())
-          .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-          .formLogin(formLogin -> formLogin.disable()).httpBasic(httpBasic -> httpBasic.disable())
-          // 로그아웃 처리
-          .logout(logout -> logout.logoutUrl("/api/auth/logout")
-              .logoutSuccessHandler((request, response, authentication) -> {
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"message\": \"로그아웃 성공\"}");
-              }).invalidateHttpSession(true).clearAuthentication(true))
-          // 동시 접속 제한, 같은 사용자가 동시에 접속 시 먼저 접속한 session을 invalidate함
-          .sessionManagement(
-              session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                  .maximumSessions(1).maxSessionsPreventsLogin(false))
-          // 예외 처리
-          .exceptionHandling(exceptionHandling -> exceptionHandling
-              .authenticationEntryPoint((request, response, authException) -> {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"error\": \"인증이 필요합니다.\"}");
-              }).accessDeniedHandler((request, response, accessDeniedException) -> {
-                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"error\": \"접근 권한이 없습니다.\"}");
-              }));
+        http.csrf(csrf -> csrf.disable()).httpBasic(httpBasicSpec -> httpBasicSpec.disable())
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .formLogin(formLogin -> formLogin.disable()).httpBasic(httpBasic -> httpBasic.disable())
+                // 로그아웃 처리
+                .logout(logout -> logout.logoutUrl("/api/auth/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"message\": \"로그아웃 성공\"}");
+                        }).invalidateHttpSession(true).clearAuthentication(true))
+                // 동시 접속 제한, 같은 사용자가 동시에 접속 시 먼저 접속한 session을 invalidate함
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                                .maximumSessions(1).maxSessionsPreventsLogin(false))
+                // 예외 처리
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"error\": \"인증이 필요합니다.\"}");
+                        }).accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json;charset=UTF-8");
+                            response.getWriter().write("{\"error\": \"접근 권한이 없습니다.\"}");
+                        }));
 
-      return http.build();
+        return http.build();
     }
-    
+
     @Bean
     RoleHierarchy roleHierachy() {
         return RoleHierarchyImpl.withDefaultRolePrefix()
@@ -68,13 +68,15 @@ public class SecurityConfig {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
+
     @Bean
-    public AuthenticationManager authenticationManager(
-        AuthenticationConfiguration authenticationConfiguration) throws Exception {
-      return authenticationConfiguration.getAuthenticationManager();
+    AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
 
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-      auth.userDetailsService(userDetailsService).passwordEncoder(passEncoder());
+        auth.userDetailsService(userDetailsService).passwordEncoder(passEncoder());
     }
+
 }
