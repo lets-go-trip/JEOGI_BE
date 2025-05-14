@@ -1,7 +1,9 @@
 package com.ssafy.tripchat.reservation.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.ssafy.tripchat.common.exception.InvalidRequestException;
 import com.ssafy.tripchat.reservation.domain.ParkingLots;
 import com.ssafy.tripchat.travel.domain.Attractions;
 import com.ssafy.tripchat.travel.domain.ContentTypes;
@@ -58,9 +60,7 @@ class ParkingLotsRepositoryTest {
         ParkingLots parkingLot = ParkingLots.builder()
                 .attraction(attraction)
                 .totalCount(10)
-                .availableCount(10)
                 .build();
-
         parkingLotsRepository.save(parkingLot);
 
         // when
@@ -68,10 +68,44 @@ class ParkingLotsRepositoryTest {
                 .orElseThrow(() -> new RuntimeException("주차 공간을 찾을 수 없습니다."));
 
         // then
-        assertThat(foundParkingLot).extracting("totalCount", "availableCount")
-                .containsExactly(parkingLot.getTotalCount(), parkingLot.getAvailableCount());
+        assertThat(foundParkingLot).extracting("totalCount").isEqualTo(parkingLot.getTotalCount());
+
     }
-    
+
+    @DisplayName("존재하지 않는 주차장 조회시 예외를 발생합니다.")
+    @Test
+    public void findInValidParkingLot() throws Exception {
+
+        // given
+        ContentTypes contentsType = createContentType("관광지");
+        contentTypesRepository.save(contentsType);
+
+        Metropolitans metropolitan = createMetropolitan(1, "서울특별시");
+        metropolitansRepository.save(metropolitan);
+
+        Locals local = createLocal(metropolitan.getCode(), 1, "노원구");
+        localsRepository.save(local);
+
+        Attractions attraction = new Attractions(metropolitan, contentsType, local, "제목", null, null, 0, 0,
+                null, null, null);
+        attractionsRepository.save(attraction);
+
+        ParkingLots parkingLot = ParkingLots.builder()
+                .attraction(attraction)
+                .totalCount(10)
+                .build();
+
+        parkingLotsRepository.save(parkingLot);
+
+        int invalidId = -1;
+
+        // when // then
+        assertThatThrownBy(() -> parkingLotsRepository.findById(invalidId)
+                .orElseThrow(() -> new InvalidRequestException("주차 공간을 찾을 수 없습니다.")))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessage("주차 공간을 찾을 수 없습니다.");
+    }
+
     private Locals createLocal(int mCode, int code, String name) {
         return new Locals(mCode, code, name);
     }
