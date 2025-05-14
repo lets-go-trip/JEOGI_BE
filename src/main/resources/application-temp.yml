@@ -3,10 +3,10 @@ spring:
     name: tripchat
 
   datasource:
-    driver-class-name: ${DB_DRIVER}
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/tripchat?serverTimezone=UTC
+    username: ssafy
+    password: ssafy
 
   jpa:
     hibernate:
