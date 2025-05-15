@@ -1,9 +1,11 @@
 package com.ssafy.tripchat.global.security;
 
 import com.ssafy.tripchat.global.security.domain.LoginRequest;
+import com.ssafy.tripchat.global.security.domain.MemberPrincipal;
 import com.ssafy.tripchat.global.security.domain.RegisterRequest;
 import com.ssafy.tripchat.global.security.domain.UserResponse;
 import com.ssafy.tripchat.member.domain.Members;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -12,9 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,34 +32,27 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
 
+    @Operation(summary = "로그인", description = "사용자명과 비밀번호로 로그인합니다.")
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest, HttpSession session) {
-        try {
-            // 인증 시도
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getId(),
-                            loginRequest.getPassword()
-                    )
-            );
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        // 실제 구현은 Filter에서 처리됨
+        return ResponseEntity.ok("로그인 성공");
+    }
 
-            // 인증 성공 시 SecurityContext에 저장
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+    @GetMapping("/test")
+    public String test(@AuthenticationPrincipal MemberPrincipal user, HttpServletRequest request, Authentication auth) {
+        System.out.println(request);
+        System.out.println("auth: " + auth.getPrincipal());
+        System.out.println("auth: " + auth.getPrincipal().getClass());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        MemberPrincipal user1 = (MemberPrincipal) authentication.getPrincipal();
+        System.out.println(user1.getAuthorities());
+        System.out.println(user1.getUsername());
+        System.out.println(user1.getId());
 
-            // 세션에 사용자 정보 저장
-            Members member = userService.findById(loginRequest.getId());
-            session.setAttribute("USER", member);
-
-            return ResponseEntity.ok(Map.of(
-                    "message", "로그인 성공",
-                    "user", UserResponse.from(member),
-                    "sessionId", session.getId()
-            ));
-
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "아이디 또는 비밀번호가 잘못되었습니다."));
-        }
+        System.out.println(authentication);
+        System.out.println(user);
+        return "test";
     }
 
     @PostMapping("/register")

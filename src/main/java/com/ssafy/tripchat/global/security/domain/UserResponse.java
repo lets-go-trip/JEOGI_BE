@@ -15,7 +15,8 @@ public class UserResponse {
     public static UserResponse from(Members member) {
         return new UserResponse(
                 member.getUsername(),
-                member.getNickname(), member.getEmail()
+                member.getNickname(),
+                member.getEmail()
         );
     }
 }

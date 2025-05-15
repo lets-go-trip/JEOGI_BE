@@ -12,11 +12,13 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @Configuration
@@ -27,10 +29,11 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authMgr) throws Exception {
         http.csrf(csrf -> csrf.disable()).httpBasic(httpBasicSpec -> httpBasicSpec.disable())
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                .formLogin(formLogin -> formLogin.disable()).httpBasic(httpBasic -> httpBasic.disable())
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(httpBasic -> httpBasic.disable())
                 // 로그아웃 처리
                 .logout(logout -> logout.logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> {
@@ -42,6 +45,9 @@ public class SecurityConfig {
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                                 .maximumSessions(1).maxSessionsPreventsLogin(false))
+                // 세션 자동 저장 옵션
+                .securityContext(sc -> sc.requireExplicitSave(false))
+                .addFilterAt(new JsonLoginFilter(authMgr), UsernamePasswordAuthenticationFilter.class)
                 // 예외 처리
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint((request, response, authException) -> {
@@ -58,7 +64,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    RoleHierarchy roleHierachy() {
+    RoleHierarchy roleHierarchy() {
         return RoleHierarchyImpl.withDefaultRolePrefix()
                 .role("ADMIN").implies("USER").role("USER").implies("GUEST").build();
     }
