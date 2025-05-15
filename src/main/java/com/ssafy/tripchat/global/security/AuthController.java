@@ -1,7 +1,6 @@
 package com.ssafy.tripchat.global.security;
 
 import com.ssafy.tripchat.global.security.domain.LoginRequest;
-import com.ssafy.tripchat.global.security.domain.MemberPrincipal;
 import com.ssafy.tripchat.global.security.domain.RegisterRequest;
 import com.ssafy.tripchat.global.security.domain.UserResponse;
 import com.ssafy.tripchat.member.domain.Members;
@@ -14,8 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,23 +35,7 @@ public class AuthController {
         // 실제 구현은 Filter에서 처리됨
         return ResponseEntity.ok("로그인 성공");
     }
-
-    @GetMapping("/test")
-    public String test(@AuthenticationPrincipal MemberPrincipal user, HttpServletRequest request, Authentication auth) {
-        System.out.println(request);
-        System.out.println("auth: " + auth.getPrincipal());
-        System.out.println("auth: " + auth.getPrincipal().getClass());
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        MemberPrincipal user1 = (MemberPrincipal) authentication.getPrincipal();
-        System.out.println(user1.getAuthorities());
-        System.out.println(user1.getUsername());
-        System.out.println(user1.getId());
-
-        System.out.println(authentication);
-        System.out.println(user);
-        return "test";
-    }
-
+    
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest) {
         try {
