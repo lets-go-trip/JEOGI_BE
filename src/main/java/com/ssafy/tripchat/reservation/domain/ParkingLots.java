@@ -11,8 +11,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ParkingLots {
@@ -29,10 +31,16 @@ public class ParkingLots {
 
     // TODO: 낙관적 락 추가예정
 
+//    @Builder
+//    public ParkingLots(Attractions attraction, int totalCount) {
+//        this.attraction = attraction;
+//        this.totalCount = totalCount;
+//    }
+
     @Builder
-    public ParkingLots(Attractions attraction, int totalCount) {
+    public ParkingLots(int id, Attractions attraction, int totalCount) {
+        this.id = id;
         this.attraction = attraction;
         this.totalCount = totalCount;
     }
-
 }
