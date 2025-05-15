@@ -202,3 +202,4 @@ $RECYCLE.BIN/
 .gradle/
 build/
 env
+.idea
