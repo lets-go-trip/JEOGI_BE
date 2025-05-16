@@ -1,5 +1,6 @@
 package com.ssafy.tripchat.reservation.service;
 
+import com.ssafy.tripchat.common.aop.WithLock;
 import com.ssafy.tripchat.common.exception.InvalidRequestException;
 import com.ssafy.tripchat.member.domain.Members;
 import com.ssafy.tripchat.member.domain.MembersRepository;
@@ -52,6 +53,7 @@ public class ParkingLotReservationService {
      * @param reservationRequest 주차장 예약 요청 정보
      * @return 예약 성공 여부
      */
+    @WithLock(key = "#reservationRequest.parkingLotId")
     @Transactional
     public ParkingReservationResponse reserveParkingLot(int memberId, ParkingReservationRequest reservationRequest) {
 

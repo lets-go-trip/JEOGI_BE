@@ -29,14 +29,6 @@ public class ParkingLots {
 
     private int totalCount;
 
-    // TODO: 낙관적 락 추가예정
-
-//    @Builder
-//    public ParkingLots(Attractions attraction, int totalCount) {
-//        this.attraction = attraction;
-//        this.totalCount = totalCount;
-//    }
-
     @Builder
     public ParkingLots(int id, Attractions attraction, int totalCount) {
         this.id = id;

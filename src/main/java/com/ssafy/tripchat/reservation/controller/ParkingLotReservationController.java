@@ -26,7 +26,7 @@ public class ParkingLotReservationController {
             @ParameterObject ParkingReservationRequest request) {
         return parkingLotReservationService.getAvailableParkingSpaces(request);
     }
-    
+
     @PostMapping("/api/v1/parking-reservations/{parkingLotId}")
     public ResponseEntity<ParkingReservationResponse> createParkingReservation(
             @AuthenticationPrincipal MemberPrincipal principal,
@@ -34,7 +34,10 @@ public class ParkingLotReservationController {
             @ParameterObject ParkingReservationRequest request) {
         int memberId = principal.getId();
 
-        URI location = URI.create("/api/v1/parking-reservations/" + parkingLotId);
-        return ResponseEntity.created(location).body(parkingLotReservationService.reserveParkingLot(memberId, request));
+        ParkingReservationResponse response = parkingLotReservationService.reserveParkingLot(memberId,
+                request);
+        URI location = URI.create("/api/v1/parking-reservations/" + response.getParkingLotId());
+
+        return ResponseEntity.created(location).body(response);
     }
 }
