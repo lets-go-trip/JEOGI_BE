@@ -2,6 +2,7 @@ package com.ssafy.tripchat.travel.domain;
 
 import org.springframework.data.jpa.domain.Specification;
 
+@Deprecated
 public class AttractionsSpecification {
 	public static Specification<Attractions> filterByConditions(Integer metropolitanCode, Integer localCode, Integer contentTypeId) {
         return Specification.where(hasMetropolitanCode(metropolitanCode))
