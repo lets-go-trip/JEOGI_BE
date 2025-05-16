@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ssafy.tripchat.common.exception.InvalidRequestException;
+import com.ssafy.tripchat.member.domain.Members;
 import com.ssafy.tripchat.reservation.domain.ParkingLots;
 import com.ssafy.tripchat.travel.domain.Attractions;
 import com.ssafy.tripchat.travel.domain.ContentTypes;
@@ -107,14 +108,29 @@ class ParkingLotsRepositoryTest {
     }
 
     private Locals createLocal(int mCode, int code, String name) {
-        return new Locals(mCode, code, name);
+        Locals local = new Locals(mCode, code, name);
+        localsRepository.save(local);
+        return local;
     }
 
     private Metropolitans createMetropolitan(int code, String name) {
-        return new Metropolitans(code, name);
+        Metropolitans metropolitan = new Metropolitans(code, name);
+        metropolitansRepository.save(metropolitan);
+        return metropolitan;
     }
 
     private ContentTypes createContentType(String name) {
-        return new ContentTypes(name);
+        ContentTypes contentType = new ContentTypes(name);
+        contentTypesRepository.save(contentType);
+        return contentType;
+    }
+
+    private Members createMember(String suffix) {
+        Members member = new Members();
+        member.setNickname("테스트" + suffix);
+        member.setEmail("test@google.com" + suffix);
+        member.setPassword("test1234" + suffix);
+        member.setUsername("test" + suffix);
+        return member;
     }
 }

@@ -16,6 +16,7 @@ import com.ssafy.tripchat.travel.repository.ContentTypesRepository;
 import com.ssafy.tripchat.travel.repository.LocalsRepository;
 import com.ssafy.tripchat.travel.repository.MetropolitansRepository;
 import java.time.LocalDateTime;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,30 +27,31 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 class ParkingReservationRepositoryTest {
 
-    // 필요한 Fixture 정리하기
-    // 주차 공간이 있는지 확인하기
-    // 주차 공간이 있다면 예약하기
-    // 예약이 정상적으로 완료되었는지 확인하기
     @Autowired
     private ParkingReservationRepository parkingReservationRepository;
-
     @Autowired
     private ParkingLotsRepository parkingLotsRepository;
-
     @Autowired
     private AttractionsRepository attractionsRepository;
-
     @Autowired
     private ContentTypesRepository contentTypesRepository;
-
     @Autowired
     private LocalsRepository localsRepository;
-
     @Autowired
     private MetropolitansRepository metropolitansRepository;
-
     @Autowired
     private MembersRepository membersRepository;
+
+    @AfterEach
+    public void tearDown() {
+        parkingReservationRepository.deleteAllInBatch();
+        parkingLotsRepository.deleteAllInBatch();
+        attractionsRepository.deleteAllInBatch();
+        contentTypesRepository.deleteAllInBatch();
+        localsRepository.deleteAllInBatch();
+        metropolitansRepository.deleteAllInBatch();
+        membersRepository.deleteAllInBatch();
+    }
 
     // 주차 공간 조회, 주차 예약 생성
     @DisplayName("잔여 주차 공간 조회 테스트")
