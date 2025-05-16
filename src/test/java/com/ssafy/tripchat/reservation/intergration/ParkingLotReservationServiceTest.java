@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,17 @@ class ParkingLotReservationServiceTest {
 
     @Autowired
     ParkingLotReservationService parkingService;
+
+    @AfterEach
+    public void tearDown() {
+        parkingReservationRepository.deleteAllInBatch();
+        parkingLotsRepository.deleteAllInBatch();
+        attractionsRepository.deleteAllInBatch();
+        contentTypesRepository.deleteAllInBatch();
+        localsRepository.deleteAllInBatch();
+        metropolitansRepository.deleteAllInBatch();
+        membersRepository.deleteAllInBatch();
+    }
 
     @DisplayName("10명의 사용자가 동시에 5 자리남은 주차장에 예약을 시도한다.")
     @Test
@@ -151,8 +163,8 @@ class ParkingLotReservationServiceTest {
                     m.getId(), request, startLatch, doneLatch));
         }
 
-        startLatch.countDown(); // 모든 스레드 동시에 시작
-        doneLatch.await();      // 모든 스레드 끝날 때까지 대기
+        startLatch.countDown();
+        doneLatch.await();
         executor.shutdown();
 
         // ── then ─────────────────────────────────────────────────────────────────────
