@@ -3,16 +3,11 @@ package com.ssafy.tripchat.travel;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.util.ArrayBuilders;
-import com.querydsl.core.QueryFactory;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.tripchat.travel.domain.*;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.ssafy.tripchat.member.domain.Members;
 import com.ssafy.tripchat.travel.dto.AttractionSearchCondition;
 import com.ssafy.tripchat.travel.repository.AttractionsRepository;
 
@@ -25,13 +20,10 @@ public class AttractionService {
 	private static final double KM_TO_LATITUDE = 0.009;
 	private static final double KM_TO_LONGITUDE = 0.011;
 
-	private final AttractionsRepository attractionsRepository;
+	// private final AttractionsRepository attractionsRepository;
 	private final JPAQueryFactory queryFactory;
 
 	QAttractions attractions = QAttractions.attractions;
-	QMetropolitans metropolitans = QMetropolitans.metropolitans;
-	QLocals locals = QLocals.locals;
-	QContentTypes contentTypes = QContentTypes.contentTypes;
 	
     public List<Attractions> searchByCondition(AttractionSearchCondition searchCondition) {
     	int regionCode = searchCondition.getRegionCode();
