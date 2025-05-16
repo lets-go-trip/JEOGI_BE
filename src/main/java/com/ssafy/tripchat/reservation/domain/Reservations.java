@@ -10,11 +10,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Reservations extends BaseEntity {
 
     @Id
@@ -32,4 +37,13 @@ public class Reservations extends BaseEntity {
 
     @Embedded
     private ReservationPeriod reservationPeriod;
+
+    @Builder
+    public Reservations(ParkingLots parkingLot, Members member, LocalDateTime startDateTime,
+                        LocalDateTime endDateTime) {
+        this.parkingLot = parkingLot;
+        this.member = member;
+        this.reservationPeriod = new ReservationPeriod(startDateTime, endDateTime);
+    }
+
 }
