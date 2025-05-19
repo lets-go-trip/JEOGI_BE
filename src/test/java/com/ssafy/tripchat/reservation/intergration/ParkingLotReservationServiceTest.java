@@ -1,6 +1,7 @@
 package com.ssafy.tripchat.reservation.intergration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.ssafy.tripchat.common.exception.InvalidRequestException;
 import com.ssafy.tripchat.member.domain.Members;
@@ -172,6 +173,46 @@ class ParkingLotReservationServiceTest {
                 parkingReservationRepository.countParkingReservationInTimeRange(parkingLot.getId(), startTime, endTime);
 
         assertThat(reservations).isEqualTo(PARKING_CAPACITY);   // 실제 저장된 건수 = 최대 수용인원(5)
+    }
+
+    @DisplayName("동일 주차장, 동일 시간에 예약을 시도하면 예외가 발생한다.")
+    @Test
+    public void whenReservingSameParkingLotAtSameTime_thenThrowsException() throws Exception {
+        // given
+        // 주차장 1개 생성
+        ContentTypes contentsType = createContentType("관광지");
+        contentTypesRepository.save(contentsType);
+
+        Metropolitans metropolitan = createMetropolitan(1, "서울특별시");
+        metropolitansRepository.save(metropolitan);
+
+        Locals local = createLocal(metropolitan.getCode(), 1, "노원구");
+        localsRepository.save(local);
+
+        Attractions attraction = new Attractions(metropolitan, contentsType, local, "제목", null, null, 123, 123,
+                null, null, null);
+        attractionsRepository.save(attraction);
+
+        ParkingLots parkingLot = createParkingLot(attraction, 5);
+        parkingLotsRepository.save(parkingLot);
+
+        // 예약자 생성
+        Members member = createMember("1");
+        membersRepository.save(member);
+
+        // 예약 요청 생성
+        LocalDateTime startTime = LocalDateTime.now().withMinute(0).withSecond(0).plusHours(1);
+        LocalDateTime endTime = LocalDateTime.now().withMinute(0).withSecond(0).plusHours(2);
+
+        ParkingReservationRequest request = createParkingReservationRequest(
+                parkingLot.getId(), startTime, endTime);
+
+        parkingService.reserveParkingLot(member.getId(), request);
+        
+        // when // then
+        assertThatThrownBy(() -> parkingService.reserveParkingLot(member.getId(), request))
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessage("이미 동일 시간대 예약이 존재합니다.");
     }
 
     private Locals createLocal(int mCode, int code, String name) {

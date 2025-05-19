@@ -11,6 +11,7 @@ import com.ssafy.tripchat.reservation.dto.response.ParkingReservationResponse;
 import com.ssafy.tripchat.reservation.repository.ParkingLotsRepository;
 import com.ssafy.tripchat.reservation.repository.ParkingReservationRepository;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -68,11 +69,20 @@ public class ParkingLotReservationService {
         LocalDateTime reservationRequestStartDateTime = reservationRequest.getStartDateTime();
         LocalDateTime reservationRequestEndDateTime = reservationRequest.getEndDateTime();
 
-        int reservationCount = parkingReservationRepository.countParkingReservationInTimeRange(parkingLotId,
+//        int reservationCount = parkingReservationRepository.countParkingReservationInTimeRange(parkingLotId,
+//                reservationRequestStartDateTime,
+//                reservationRequestEndDateTime);
+
+        List<Reservations> overlaps = parkingReservationRepository.findOverlappingReservations(
+                parkingLotId,
                 reservationRequestStartDateTime,
                 reservationRequestEndDateTime);
 
-        int availableParkingSpaces = parkingLot.getTotalCount() - reservationCount;
+        checkDuplicateRequest(memberId, overlaps);
+
+        // TODO : 중복 예약 체크
+
+        int availableParkingSpaces = parkingLot.getTotalCount() - overlaps.size();
 
         if (availableParkingSpaces <= 0) {
             throw new InvalidRequestException("예약 가능한 주차 공간이 없습니다.");
@@ -83,6 +93,15 @@ public class ParkingLotReservationService {
                 Reservations.from(parkingLot, reservationRequest, member));
 
         return ParkingReservationResponse.from(reservations);
+    }
+
+    private static void checkDuplicateRequest(int memberId, List<Reservations> overlaps) {
+        boolean hasDuplicationForSameMember = overlaps.stream()
+                .anyMatch(reservation -> reservation.getMember().getId() == memberId);
+
+        if (hasDuplicationForSameMember) {
+            throw new InvalidRequestException("이미 동일 시간대 예약이 존재합니다.");
+        }
     }
 
 }
