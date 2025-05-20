@@ -30,5 +30,7 @@ public interface ParkingReservationRepository extends JpaRepository<Reservations
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime
     );
+    
+    List<Reservations> findReservationsByMemberId(int memberId);
 
 }

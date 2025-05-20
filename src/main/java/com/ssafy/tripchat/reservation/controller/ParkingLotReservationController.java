@@ -3,7 +3,9 @@ package com.ssafy.tripchat.reservation.controller;
 import com.ssafy.tripchat.global.security.domain.MemberPrincipal;
 import com.ssafy.tripchat.reservation.dto.request.ParkingReservationRequest;
 import com.ssafy.tripchat.reservation.dto.response.ParkingReservationResponse;
+import com.ssafy.tripchat.reservation.dto.response.ParkingReservationsResponse;
 import com.ssafy.tripchat.reservation.service.ParkingLotReservationService;
+import com.ssafy.tripchat.reservation.service.ParkingSpaceReservationService;
 import jakarta.validation.Valid;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ParkingLotReservationController {
 
     private final ParkingLotReservationService parkingLotReservationService;
+    private final ParkingSpaceReservationService parkingSpaceReservationService;
 
     @GetMapping("/api/v1/parking-reservations/{parkingLotId}")
     public int getAvailableParkingSpaces(
@@ -42,4 +45,13 @@ public class ParkingLotReservationController {
 
         return ResponseEntity.created(location).body(response);
     }
+    
+    @GetMapping("/api/v1/parking-reservations/me")
+    public ResponseEntity<ParkingReservationsResponse> getMyParkingReservations(
+            @AuthenticationPrincipal MemberPrincipal principal) {
+        int memberId = principal.getId();
+        return ResponseEntity.ok(
+                ParkingReservationsResponse.from(parkingSpaceReservationService.getReservationsByMemberId(memberId)));
+    }
+
 }

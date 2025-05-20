@@ -67,18 +67,12 @@ public class ParkingLotReservationService {
         LocalDateTime reservationRequestStartDateTime = reservationRequest.getStartDateTime();
         LocalDateTime reservationRequestEndDateTime = reservationRequest.getEndDateTime();
 
-//        int reservationCount = parkingReservationRepository.countParkingReservationInTimeRange(parkingLotId,
-//                reservationRequestStartDateTime,
-//                reservationRequestEndDateTime);
-
         List<Reservations> overlaps = parkingReservationRepository.findOverlappingReservations(
                 parkingLotId,
                 reservationRequestStartDateTime,
                 reservationRequestEndDateTime);
 
         checkDuplicateRequest(memberId, overlaps);
-
-        // TODO : 중복 예약 체크
 
         int availableParkingSpaces = parkingLot.getTotalCount() - overlaps.size();
 
@@ -93,6 +87,14 @@ public class ParkingLotReservationService {
         return ParkingReservationResponse.from(reservations);
     }
 
+    /**
+     * 개인 주차장 예약 내역 조회
+     *
+     * @param memberId 회원 ID
+     * @return 예약 내역 리스트
+     */
+
+
     private static void checkDuplicateRequest(int memberId, List<Reservations> overlaps) {
         boolean hasDuplicationForSameMember = overlaps.stream()
                 .anyMatch(reservation -> reservation.getMember().getId() == memberId);
@@ -101,5 +103,6 @@ public class ParkingLotReservationService {
             throw new InvalidRequestException("이미 동일 시간대 예약이 존재합니다.");
         }
     }
+
 
 }
