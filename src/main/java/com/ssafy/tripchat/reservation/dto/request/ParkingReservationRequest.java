@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
@@ -16,12 +15,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class ParkingReservationRequest {
-
-    @NotNull(message = "예약할 주차장 ID는 필수입니다.")
-    private Integer parkingLotId;
-
+    
     @NotNull(message = "예약할 날짜와 시작 시간은 필수입니다.")
     @Future(message = "예약 시작 시간은 현재 이후여야 합니다.")
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")

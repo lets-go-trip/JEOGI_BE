@@ -8,12 +8,14 @@ import com.ssafy.tripchat.common.exception.InvalidRequestException;
 import com.ssafy.tripchat.member.domain.Members;
 import com.ssafy.tripchat.member.domain.MembersRepository;
 import com.ssafy.tripchat.reservation.domain.ParkingLots;
+import com.ssafy.tripchat.reservation.domain.ReservationPeriod;
 import com.ssafy.tripchat.reservation.domain.Reservations;
 import com.ssafy.tripchat.reservation.dto.request.ParkingReservationRequest;
 import com.ssafy.tripchat.reservation.dto.response.ParkingReservationResponse;
 import com.ssafy.tripchat.reservation.repository.ParkingLotsRepository;
 import com.ssafy.tripchat.reservation.repository.ParkingReservationRepository;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,7 +60,7 @@ class ParkingLotReservationServiceTest {
                 .thenReturn(reservedSpaces);
 
         // when
-        int result = parkingService.getAvailableParkingSpaces(request);
+        int result = parkingService.getAvailableParkingSpaces(parkingLotId, request);
 
         // then
         int expectedAvailableSpaces = totalSpaces - reservedSpaces;
@@ -81,7 +83,8 @@ class ParkingLotReservationServiceTest {
         when(parkingLotsRepository.findById(inValidParkingLotId)).thenReturn(Optional.empty());
 
         // when // then
-        assertThatThrownBy(() -> parkingService.getAvailableParkingSpaces(parkingReservationRequest))
+        assertThatThrownBy(
+                () -> parkingService.getAvailableParkingSpaces(inValidParkingLotId, parkingReservationRequest))
                 .isInstanceOf(InvalidRequestException.class)
                 .hasMessage("존재하지 않는 주차장입니다.");
     }
@@ -102,18 +105,19 @@ class ParkingLotReservationServiceTest {
                 .username("홍길동")
                 .build();
 
-        ParkingReservationRequest parkingReservationRequest = createParkingReservationRequest(1, startTime, endTime);
+        ParkingReservationRequest parkingReservationRequest = createParkingReservationRequest(parkingLot.getId(),
+                startTime, endTime);
 
         when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
         when(parkingLotsRepository.findById(1)).thenReturn(Optional.of(parkingLot));
-        when(parkingReservationRepository.countParkingReservationInTimeRange(1, startTime, endTime)).thenReturn(1);
 
         Reservations dummy = Reservations.from(parkingLot, parkingReservationRequest, member);
         when(parkingReservationRepository.save(Mockito.any(Reservations.class)))
                 .thenReturn(dummy);
 
         // when
-        ParkingReservationResponse parkingReservationResponse = parkingService.reserveParkingLot(memberId,
+        ParkingReservationResponse parkingReservationResponse = parkingService.reserveParkingLot(parkingLot.getId(),
+                memberId,
                 parkingReservationRequest);
 
         //then
@@ -129,25 +133,49 @@ class ParkingLotReservationServiceTest {
     @Test
     public void canNotReserveParkingSpace() throws Exception {
         // given
-        ParkingLots parkingLot = createParkingLot(1, 10);
+        ParkingLots parkingLot = createParkingLot(1, 2);
         LocalDateTime startTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endTime = startTime.plusHours(2L);
 
-        int memberId = 1;
+        Members member1 = Members.builder()
+                .id(1)
+                .email("test1@gmail.com")
+                .build();
 
-        Members member = Members.builder()
-                .id(memberId)
-                .email("test@gmail.com")
+        Members member2 = Members.builder()
+                .id(2)
+                .email("test2@gmail.com")
+                .build();
+
+        Members requestMember = Members.builder()
+                .id(3)
+                .email("test2@gmail.com")
+                .build();
+
+        Reservations reservation1 = Reservations.builder()
+                .parkingLot(parkingLot)
+                .reservationPeriod(new ReservationPeriod(startTime, endTime))
+                .member(member1)
+                .build();
+
+        Reservations reservation2 = Reservations.builder()
+                .parkingLot(parkingLot)
+                .reservationPeriod(new ReservationPeriod(startTime, endTime))
+                .member(member2)
                 .build();
 
         ParkingReservationRequest parkingReservationRequest = createParkingReservationRequest(1, startTime, endTime);
 
-        when(membersRepository.findById(memberId)).thenReturn(Optional.of(member));
-        when(parkingLotsRepository.findById(1)).thenReturn(Optional.of(parkingLot));
-        when(parkingReservationRepository.countParkingReservationInTimeRange(1, startTime, endTime)).thenReturn(10);
+        when(membersRepository.findById(requestMember.getId())).thenReturn(Optional.of(requestMember));
+        when(parkingLotsRepository.findById(parkingLot.getId())).thenReturn(Optional.of(parkingLot));
+        when(parkingReservationRepository.findOverlappingReservations(1, startTime, endTime)).thenReturn(
+                List.of(reservation1, reservation2)
+        );
 
         // when // then
-        assertThatThrownBy(() -> parkingService.reserveParkingLot(memberId, parkingReservationRequest))
+        assertThatThrownBy(
+                () -> parkingService.reserveParkingLot(parkingLot.getId(), requestMember.getId(),
+                        parkingReservationRequest))
                 .isInstanceOf(InvalidRequestException.class)
                 .hasMessage("예약 가능한 주차 공간이 없습니다.");
     }
@@ -162,7 +190,6 @@ class ParkingLotReservationServiceTest {
     private ParkingReservationRequest createParkingReservationRequest(int parkingLotId, LocalDateTime startDateTime,
                                                                       LocalDateTime endDateTime) {
         return ParkingReservationRequest.builder()
-                .parkingLotId(parkingLotId)
                 .startDateTime(startDateTime)
                 .endDateTime(endDateTime)
                 .build();

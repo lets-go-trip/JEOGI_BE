@@ -64,6 +64,7 @@ class ParkingLotReservationServiceTest {
 
     @AfterEach
     public void tearDown() {
+        // AutoIncrement는 초기화가 안되기 때문에 PK는 항상 getter를 사용하자
         parkingReservationRepository.deleteAllInBatch();
         parkingLotsRepository.deleteAllInBatch();
         attractionsRepository.deleteAllInBatch();
@@ -101,11 +102,12 @@ class ParkingLotReservationServiceTest {
         LocalDateTime startTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endTime = startTime.plusHours(2L);
 
-        ParkingReservationRequest parkingReservationRequest = createParkingReservationRequest(parkingLot.getId(),
+        ParkingReservationRequest parkingReservationRequest = createParkingReservationRequest(
                 startTime, endTime);
 
         // when
-        ParkingReservationResponse parkingReservationResponse = parkingService.reserveParkingLot(member.getId(),
+        ParkingReservationResponse parkingReservationResponse = parkingService.reserveParkingLot(parkingLot.getId(),
+                member.getId(),
                 parkingReservationRequest);
 
         // then
@@ -152,7 +154,7 @@ class ParkingLotReservationServiceTest {
         LocalDateTime startTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endTime = startTime.plusHours(2);
         ParkingReservationRequest request = createParkingReservationRequest(
-                parkingLot.getId(), startTime, endTime);
+                startTime, endTime);
 
         // ── when  ───────────────────────────────────────────────────────────
         CountDownLatch startLatch = new CountDownLatch(1);      // 동시에 출발
@@ -161,7 +163,7 @@ class ParkingLotReservationServiceTest {
 
         for (Members m : members) {
             executor.execute(new ReservationWorker(
-                    m.getId(), request, startLatch, doneLatch));
+                    2, m.getId(), request, startLatch, doneLatch));
         }
 
         startLatch.countDown();
@@ -205,12 +207,12 @@ class ParkingLotReservationServiceTest {
         LocalDateTime endTime = LocalDateTime.now().withMinute(0).withSecond(0).plusHours(2);
 
         ParkingReservationRequest request = createParkingReservationRequest(
-                parkingLot.getId(), startTime, endTime);
+                startTime, endTime);
 
-        parkingService.reserveParkingLot(member.getId(), request);
-        
+        parkingService.reserveParkingLot(parkingLot.getId(), member.getId(), request);
+
         // when // then
-        assertThatThrownBy(() -> parkingService.reserveParkingLot(member.getId(), request))
+        assertThatThrownBy(() -> parkingService.reserveParkingLot(parkingLot.getId(), member.getId(), request))
                 .isInstanceOf(InvalidRequestException.class)
                 .hasMessage("이미 동일 시간대 예약이 존재합니다.");
     }
@@ -234,10 +236,9 @@ class ParkingLotReservationServiceTest {
                 .build();
     }
 
-    private ParkingReservationRequest createParkingReservationRequest(int parkingLotId, LocalDateTime startDateTime,
+    private ParkingReservationRequest createParkingReservationRequest(LocalDateTime startDateTime,
                                                                       LocalDateTime endDateTime) {
         return ParkingReservationRequest.builder()
-                .parkingLotId(parkingLotId)
                 .startDateTime(startDateTime)
                 .endDateTime(endDateTime)
                 .build();
@@ -253,15 +254,19 @@ class ParkingLotReservationServiceTest {
     }
 
     private class ReservationWorker implements Runnable {
+        private final Integer parkingLotId;
         private final Integer memberId;
         private final ParkingReservationRequest req;
         private final CountDownLatch start;
         private final CountDownLatch done;
 
-        ReservationWorker(Integer memberId,
-                          ParkingReservationRequest req,
-                          CountDownLatch start,
-                          CountDownLatch done) {
+        ReservationWorker(
+                Integer parkingLotId,
+                Integer memberId,
+                ParkingReservationRequest req,
+                CountDownLatch start,
+                CountDownLatch done) {
+            this.parkingLotId = parkingLotId;
             this.memberId = memberId;
             this.req = req;
             this.start = start;
@@ -273,7 +278,7 @@ class ParkingLotReservationServiceTest {
             try {
                 start.await();
                 try {
-                    parkingService.reserveParkingLot(memberId, req);
+                    parkingService.reserveParkingLot(parkingLotId, memberId, req);
                 } catch (InvalidRequestException ignore) {
                     // 동시성을 보장하는 테스트를 위한 예외 처리
                 }

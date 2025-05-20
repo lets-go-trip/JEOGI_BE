@@ -35,8 +35,7 @@ public class ParkingLotReservationService {
      */
 
     @Transactional(readOnly = true)
-    public int getAvailableParkingSpaces(ParkingReservationRequest reservationRequest) {
-        int parkingLotId = reservationRequest.getParkingLotId();
+    public int getAvailableParkingSpaces(int parkingLotId, ParkingReservationRequest reservationRequest) {
 
         ParkingLots parkingLot = parkingLotsRepository.findById(parkingLotId)
                 .orElseThrow(() -> new InvalidRequestException("존재하지 않는 주차장입니다."));
@@ -54,11 +53,10 @@ public class ParkingLotReservationService {
      * @param reservationRequest 주차장 예약 요청 정보
      * @return 예약 성공 여부
      */
-    @WithLock(key = "#reservationRequest.parkingLotId")
+    @WithLock(key = "#parkingLotId")
     @Transactional
-    public ParkingReservationResponse reserveParkingLot(int memberId, ParkingReservationRequest reservationRequest) {
-
-        int parkingLotId = reservationRequest.getParkingLotId();
+    public ParkingReservationResponse reserveParkingLot(int parkingLotId, int memberId,
+                                                        ParkingReservationRequest reservationRequest) {
 
         ParkingLots parkingLot = parkingLotsRepository.findById(parkingLotId)
                 .orElseThrow(() -> new InvalidRequestException("존재하지 않는 주차장입니다."));
