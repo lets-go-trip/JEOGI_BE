@@ -6,6 +6,8 @@ import java.util.List;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.tripchat.travel.domain.*;
+import com.ssafy.tripchat.travel.dto.AttractionListResponse;
+import com.ssafy.tripchat.travel.dto.AttractionResponse;
 import org.springframework.stereotype.Service;
 
 import com.ssafy.tripchat.travel.dto.AttractionSearchCondition;
@@ -24,9 +26,10 @@ public class AttractionService {
 	private final JPAQueryFactory queryFactory;
 
 	QAttractions attractions = QAttractions.attractions;
-	
-    public List<Attractions> searchByCondition(AttractionSearchCondition searchCondition) {
-    	int regionCode = searchCondition.getRegionCode();
+
+    public AttractionListResponse searchByCondition(AttractionSearchCondition searchCondition) {
+		long startTime = System.currentTimeMillis();
+    	int regionCode = searchCondition.getRegionCode() == null ? 0 : searchCondition.getRegionCode();
     	searchCondition.setMetropolitanCode(regionCode / 1000);
     	searchCondition.setLocalCode(regionCode % 1000);
 
@@ -37,46 +40,55 @@ public class AttractionService {
 						eqMetropolitanCode(searchCondition.getMetropolitanCode()),
 						eqLocalCode(searchCondition.getLocalCode()),
 						eqContentTypes(searchCondition.getContentTypeId()),
-						betweenLatitude(searchCondition.isRangeSearch(), searchCondition.getLatitude(), searchCondition.getRange() * KM_TO_LATITUDE),
-						betweenLongitude(searchCondition.isRangeSearch(), searchCondition.getLongitude(), searchCondition.getRange() * KM_TO_LONGITUDE)
+						betweenLatitude(searchCondition.getIsRangeSearch(), searchCondition.getLatitude(), searchCondition.getRange()),
+						betweenLongitude(searchCondition.getIsRangeSearch(), searchCondition.getLongitude(), searchCondition.getRange())
 				)
 				.fetch();
 
-		if (!searchCondition.isRangeSearch()){
-			return result;
+		List<AttractionResponse> response = new ArrayList<>();
+		for (Attractions attraction : result) {
+			response.add(new AttractionResponse(attraction));
 		}
 
-		List<Attractions> resultInRange = new ArrayList<>();
-		for (Attractions attraction : result) {
+		if (searchCondition.getIsRangeSearch() == null || !searchCondition.getIsRangeSearch()) {
+			double fetchTime = (System.currentTimeMillis() - startTime) / 1000.0;
+			return new AttractionListResponse(response, fetchTime);
+		}
+
+		List<AttractionResponse> responseInRange = new ArrayList<>();
+		for (AttractionResponse attraction : response) {
 			if (isInRange(searchCondition, attraction)) {
-				resultInRange.add(attraction);
+				responseInRange.add(attraction);
 			}
 		}
 
-		return resultInRange;
+		double fetchTime = (System.currentTimeMillis() - startTime) / 1000.0;
+		return new AttractionListResponse(responseInRange, fetchTime);
     }
 
 	private BooleanExpression eqMetropolitanCode(Integer metropolitanCode) {
-		return metropolitanCode != null ? attractions.metropolitan.code.eq(metropolitanCode) : null;
+		return metropolitanCode != 0 ? attractions.metropolitan.code.eq(metropolitanCode) : null;
 	}
 
 	private BooleanExpression eqLocalCode(Integer localCode) {
-		return localCode != null ? attractions.local.code.eq(localCode) : null;
+		return localCode != 0 ? attractions.local.code.eq(localCode) : null;
 	}
 
 	private BooleanExpression eqContentTypes(Integer contentTypes) {
-		return contentTypes != null ? attractions.contentTypes.id.eq(contentTypes) : null;
+		return contentTypes != 0 ? attractions.contentTypes.id.eq(contentTypes) : null;
 	}
 
 	private BooleanExpression betweenLatitude(Boolean isRangeSearch, Double latitude, Double range){
-		return isRangeSearch ? attractions.latitude.between(latitude - range, latitude + range) : null;
+		if (range == null) return null;
+		return isRangeSearch != null ? attractions.latitude.between(latitude - range, latitude + range) : null;
 	}
 
 	private BooleanExpression betweenLongitude(Boolean isRangeSearch, Double longitude, Double range){
-		return isRangeSearch ? attractions.longitude.between(longitude - range, longitude + range) : null;
+		if (range == null) return null;
+		return isRangeSearch != null ? attractions.longitude.between(longitude - range, longitude + range) : null;
 	}
 
-	private static boolean isInRange(AttractionSearchCondition searchCondition, Attractions target) {
+	private static boolean isInRange(AttractionSearchCondition searchCondition, AttractionResponse target) {
 		double distance;
 		double radius = 6371; // 지구 반지름(km)
 		double toRadian = Math.PI / 180;

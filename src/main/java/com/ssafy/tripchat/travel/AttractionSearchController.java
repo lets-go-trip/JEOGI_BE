@@ -1,16 +1,15 @@
 package com.ssafy.tripchat.travel;
 
+import java.util.List;
 import java.util.Map;
 
+import com.ssafy.tripchat.travel.dto.AttractionListResponse;
+import com.ssafy.tripchat.travel.dto.AttractionResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.ssafy.tripchat.global.security.domain.RegisterRequest;
 import com.ssafy.tripchat.global.security.domain.UserResponse;
@@ -30,11 +29,9 @@ public class AttractionSearchController {
     private final AttractionService attractionService;
 
     @GetMapping("/condition")
-    public ResponseEntity<?> searchByCondition(@Valid @RequestBody AttractionSearchCondition searchCondition) {
+    public ResponseEntity<?> searchByCondition(@Valid @ModelAttribute AttractionSearchCondition searchCondition) {
+        AttractionListResponse result = attractionService.searchByCondition(searchCondition);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(Map.of(
-                        "message", "검색 성공",
-                        "data", attractionService.searchByCondition(searchCondition)
-                ));
+                .body(result);
     }
 }
