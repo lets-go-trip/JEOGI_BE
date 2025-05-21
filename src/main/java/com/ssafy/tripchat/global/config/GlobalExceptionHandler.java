@@ -6,6 +6,7 @@ import com.ssafy.tripchat.common.exception.ErrorCode;
 import com.ssafy.tripchat.common.exception.MethodArgumentNotValidException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,6 +22,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         return ErrorResponse.toResponseEntity(ErrorCode.INVALID_INPUT, ex.getMessage());
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ErrorResponse> handleBindException(BindException ex) {
+        return ErrorResponse.toResponseEntity(ErrorCode.INVALID_INPUT,
+                ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
     }
 
 }

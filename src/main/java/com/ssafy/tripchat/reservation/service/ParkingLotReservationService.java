@@ -11,6 +11,7 @@ import com.ssafy.tripchat.reservation.dto.response.ParkingReservationResponse;
 import com.ssafy.tripchat.reservation.repository.ParkingLotsRepository;
 import com.ssafy.tripchat.reservation.repository.ParkingReservationRepository;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,8 +35,7 @@ public class ParkingLotReservationService {
      */
 
     @Transactional(readOnly = true)
-    public int getAvailableParkingSpaces(ParkingReservationRequest reservationRequest) {
-        int parkingLotId = reservationRequest.getParkingLotId();
+    public int getAvailableParkingSpaces(int parkingLotId, ParkingReservationRequest reservationRequest) {
 
         ParkingLots parkingLot = parkingLotsRepository.findById(parkingLotId)
                 .orElseThrow(() -> new InvalidRequestException("존재하지 않는 주차장입니다."));
@@ -53,11 +53,10 @@ public class ParkingLotReservationService {
      * @param reservationRequest 주차장 예약 요청 정보
      * @return 예약 성공 여부
      */
-    @WithLock(key = "#reservationRequest.parkingLotId")
+    @WithLock(key = "#parkingLotId")
     @Transactional
-    public ParkingReservationResponse reserveParkingLot(int memberId, ParkingReservationRequest reservationRequest) {
-
-        int parkingLotId = reservationRequest.getParkingLotId();
+    public ParkingReservationResponse reserveParkingLot(int parkingLotId, int memberId,
+                                                        ParkingReservationRequest reservationRequest) {
 
         ParkingLots parkingLot = parkingLotsRepository.findById(parkingLotId)
                 .orElseThrow(() -> new InvalidRequestException("존재하지 않는 주차장입니다."));
@@ -68,11 +67,14 @@ public class ParkingLotReservationService {
         LocalDateTime reservationRequestStartDateTime = reservationRequest.getStartDateTime();
         LocalDateTime reservationRequestEndDateTime = reservationRequest.getEndDateTime();
 
-        int reservationCount = parkingReservationRepository.countParkingReservationInTimeRange(parkingLotId,
+        List<Reservations> overlaps = parkingReservationRepository.findOverlappingReservations(
+                parkingLotId,
                 reservationRequestStartDateTime,
                 reservationRequestEndDateTime);
 
-        int availableParkingSpaces = parkingLot.getTotalCount() - reservationCount;
+        checkDuplicateRequest(memberId, overlaps);
+
+        int availableParkingSpaces = parkingLot.getTotalCount() - overlaps.size();
 
         if (availableParkingSpaces <= 0) {
             throw new InvalidRequestException("예약 가능한 주차 공간이 없습니다.");
@@ -84,5 +86,15 @@ public class ParkingLotReservationService {
 
         return ParkingReservationResponse.from(reservations);
     }
+
+    private void checkDuplicateRequest(int memberId, List<Reservations> overlaps) {
+        boolean hasDuplicationForSameMember = overlaps.stream()
+                .anyMatch(reservation -> reservation.getMember().getId() == memberId);
+
+        if (hasDuplicationForSameMember) {
+            throw new InvalidRequestException("이미 동일 시간대 예약이 존재합니다.");
+        }
+    }
+
 
 }

@@ -1,6 +1,7 @@
 package com.ssafy.tripchat.reservation.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.ssafy.tripchat.member.domain.Members;
 import com.ssafy.tripchat.member.domain.MembersRepository;
@@ -16,6 +17,7 @@ import com.ssafy.tripchat.travel.repository.ContentTypesRepository;
 import com.ssafy.tripchat.travel.repository.LocalsRepository;
 import com.ssafy.tripchat.travel.repository.MetropolitansRepository;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -112,6 +114,71 @@ class ParkingReservationRepositoryTest {
         // then
         assertThat(reservationCount).isEqualTo(2);
     }
+
+    @DisplayName("지정시간에 예약된 정보를 조회한다")
+    @Test
+    public void getReservedParkingLotsInfo() throws Exception {
+        // given
+        LocalDateTime startTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endTime = startTime.plusHours(1L);
+
+        Members member = createMember("1");
+        membersRepository.save(member);
+
+        ContentTypes contentsType = createContentType("관광지");
+        Metropolitans metropolitan = createMetropolitan(1, "서울특별시");
+        Locals local = createLocal(metropolitan.getCode(), 1, "노원구");
+
+        Attractions attraction = new Attractions(metropolitan, contentsType, local, "제목", null, null, 0, 0,
+                null, null, null);
+        attractionsRepository.save(attraction);
+
+        ParkingLots parkingLot = ParkingLots.builder()
+                .attraction(attraction)
+                .totalCount(10)
+                .build();
+        parkingLotsRepository.save(parkingLot);
+
+        ReservationPeriod reservationPeriod1 = ReservationPeriod.builder()
+                .startDateTime(startTime)
+                .endDateTime(endTime).build();
+
+        Reservations reservations1 = Reservations.builder()
+                .reservationPeriod(reservationPeriod1)
+                .member(member)
+                .parkingLot(parkingLot)
+                .build();
+
+        parkingReservationRepository.save(reservations1);
+
+        LocalDateTime startTime2 = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endTime2 = startTime2.plusHours(2L);
+
+        ReservationPeriod reservationPeriod2 = ReservationPeriod.builder()
+                .startDateTime(startTime2)
+                .endDateTime(endTime2).build();
+
+        Reservations reservations2 = Reservations.builder()
+                .reservationPeriod(reservationPeriod2)
+                .member(member)
+                .parkingLot(parkingLot)
+                .build();
+
+        parkingReservationRepository.save(reservations2);
+
+        // when
+        List<Reservations> reservedParkingLots = parkingReservationRepository.findOverlappingReservations(
+                parkingLot.getId(), startTime, endTime);
+
+        // then
+        assertThat(reservedParkingLots).hasSize(2)
+                .extracting("parkingLot.id", "reservationPeriod.startDateTime", "reservationPeriod.endDateTime")
+                .containsExactlyInAnyOrder(
+                        tuple(parkingLot.getId(), startTime, endTime),
+                        tuple(parkingLot.getId(), startTime2, endTime2)
+                );
+    }
+
 
     private Locals createLocal(int mCode, int code, String name) {
         Locals local = new Locals(mCode, code, name);
