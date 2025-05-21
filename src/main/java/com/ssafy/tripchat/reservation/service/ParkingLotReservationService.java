@@ -87,15 +87,7 @@ public class ParkingLotReservationService {
         return ParkingReservationResponse.from(reservations);
     }
 
-    /**
-     * 개인 주차장 예약 내역 조회
-     *
-     * @param memberId 회원 ID
-     * @return 예약 내역 리스트
-     */
-
-
-    private static void checkDuplicateRequest(int memberId, List<Reservations> overlaps) {
+    private void checkDuplicateRequest(int memberId, List<Reservations> overlaps) {
         boolean hasDuplicationForSameMember = overlaps.stream()
                 .anyMatch(reservation -> reservation.getMember().getId() == memberId);
 

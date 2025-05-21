@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,7 +46,7 @@ public class ParkingLotReservationController {
 
         return ResponseEntity.created(location).body(response);
     }
-    
+
     @GetMapping("/api/v1/parking-reservations/me")
     public ResponseEntity<ParkingReservationsResponse> getMyParkingReservations(
             @AuthenticationPrincipal MemberPrincipal principal) {
@@ -54,4 +55,12 @@ public class ParkingLotReservationController {
                 ParkingReservationsResponse.from(parkingSpaceReservationService.getReservationsByMemberId(memberId)));
     }
 
+    @DeleteMapping("/api/v1/parking-reservations/{reservationId}")
+    public ResponseEntity<Void> deleteParkingReservation(
+            @AuthenticationPrincipal MemberPrincipal principal,
+            @PathVariable int reservationId) {
+        int memberId = principal.getId();
+        parkingSpaceReservationService.deleteReservation(memberId, reservationId);
+        return ResponseEntity.noContent().build();
+    }
 }
