@@ -5,6 +5,7 @@ import com.ssafy.tripchat.reservation.repository.ParkingSpaceReservationReposito
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -14,7 +15,17 @@ public class FakeParkingSpaceReservationRepository implements ParkingSpaceReserv
     private final List<Reservations> data = Collections.synchronizedList(new ArrayList<>());
 
     @Override
-    public List<Reservations> findByReservationsByMemberId(int memberId) {
+    public Optional<Reservations> findReservationById(int reservationId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public void deleteReservation(int reservationId) {
+
+    }
+
+    @Override
+    public List<Reservations> findReservationsByMemberId(int memberId) {
         return data.stream()
                 .filter(reservations -> reservations.getMember().getId() == memberId)
                 .collect(Collectors.toList());

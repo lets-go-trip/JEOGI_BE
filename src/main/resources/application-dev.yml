@@ -3,6 +3,7 @@ spring:
     name: tripchat
 
   datasource:
+    hikari:
     driver-class-name: ${DB_DRIVER}
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -10,9 +11,19 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         show_sql: true
         format_sql: true
         highlight_sql: true
+
+  session:
+    store-type: ${SESSION_STORE}
+    redis:
+      namespace: ${SESSION_NAME}
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
