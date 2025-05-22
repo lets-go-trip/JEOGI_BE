@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class ChatController {
 
+    //TODO: 이거 다 service로 옮기기
     private final ChatRoomRepository chatRoomRepository;
     private final RedisPublisher redisPublisher;
     private final ChatMessageRepository chatMessageRepository;
