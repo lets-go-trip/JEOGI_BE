@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class RedisSubscriber implements MessageListener {
 
     private final ObjectMapper objectMapper;
-    //TODO : RedisTemplate<String, ChatRoom>로 변경 (명시하지 않아도 타입으로 매핑하도록)
     private final RedisTemplate redisTemplate;
     private final SimpMessageSendingOperations messageTemplate;
 
