@@ -1,0 +1,39 @@
+package com.ssafy.tripchat.chat.controller;
+
+
+import com.ssafy.tripchat.chat.domain.ChatMessage;
+import com.ssafy.tripchat.chat.domain.Type;
+import com.ssafy.tripchat.chat.infrastructure.RedisPublisher;
+import com.ssafy.tripchat.chat.repository.ChatMessageRepository;
+import com.ssafy.tripchat.chat.repository.ChatRoomRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.stereotype.Controller;
+
+@Slf4j
+@Controller
+@RequiredArgsConstructor
+public class ChatController {
+
+    private final ChatRoomRepository chatRoomRepository;
+    private final RedisPublisher redisPublisher;
+    private final ChatMessageRepository chatMessageRepository;
+
+    @MessageMapping("/chat/message")
+    public void message(ChatMessage message) {
+        // TODO: getSender().getNickname() 부분 적절한지 검토하기
+        if (Type.ENTER.equals(message.getType())) {
+            chatRoomRepository.enterChatRoom(message.getRoomId());
+            message.setMessage(message.getSender() + "님이 입장하셨습니다.");
+            log.info("User {} entered room {}", message.getSender(), message.getRoomId());
+        }
+
+        // TODO: Send 처리하는 부분 Service로 분리하기
+        // TODO: ENTER 메시지 DB에 안 올리는 게 적절한지 검토하기
+        if (message.getType().equals(Type.TALK)) {
+            chatMessageRepository.save(message);
+        }
+        redisPublisher.publish(chatRoomRepository.getTopic(message.getRoomId()), message);
+    }
+}
