@@ -1,28 +1,29 @@
 package com.ssafy.tripchat.chat.service;
 
-
 import com.ssafy.tripchat.chat.domain.ChatRoom;
+import com.ssafy.tripchat.chat.domain.ChatMessage;
+import com.ssafy.tripchat.chat.dto.ChatMessageListResponse;
+import com.ssafy.tripchat.chat.repository.ChatMessageRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
-public interface ChatService {
+import java.util.ArrayList;
+import java.util.List;
 
-    // TODO 채팅방 생성
-    ChatRoom saveChatRoom(ChatRoom chatRoom);
+@Service
+@RequiredArgsConstructor
+public class ChatService {
 
-    // TODO 채팅방 목록 조회
+    private final ChatMessageRepository chatMessageRepository;
 
-    // TODO 메시지 저장
+    public ChatMessageListResponse fetchAllByRoomId(String roomId) {
+        List<ChatMessage> chatMessageList = chatMessageRepository.findAllByRoomId(roomId);
+        return new ChatMessageListResponse(chatMessageList);
+    }
 
-    // TODO 메시지 조회
-
-    // TODO 채팅방 삭제
-
-    // TODO 채팅방 나가기
-
-    // TODO 메시지 전송
-
-    // TODO 메시지 수정
-
-    // TODO 메시지 삭제
-
-
+    public ChatMessageListResponse fetchWithCursorByRoomId(String roomId, int cursor) {
+        if (cursor <= 0) return new ChatMessageListResponse(new ArrayList<ChatMessage>());
+        List<ChatMessage> chatMessageList = chatMessageRepository.findTop20ByRoomIdAndIdLessThanOrderByIdDesc(roomId, cursor);
+        return new ChatMessageListResponse(chatMessageList);
+    }
 }
