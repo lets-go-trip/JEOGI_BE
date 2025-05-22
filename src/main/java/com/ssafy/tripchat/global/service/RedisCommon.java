@@ -56,6 +56,20 @@ public class RedisCommon {
 
     public <T> void publish(String topic, T message) {
         String jsonValue = gson.toJson(message);
+        log.info("published message = {}", message);
         template.convertAndSend(topic, jsonValue);
+    }
+
+    public Long getListSize(String key) {
+        return template.opsForList().size(key);
+    }
+
+    public <T> void addToListLeft(String key, T value) {
+        String jsonValue = gson.toJson(value);
+        template.opsForList().leftPush(key, jsonValue);
+    }
+
+    public void removeToListRight(String key) {
+        template.opsForList().rightPop(key);
     }
 }
