@@ -37,4 +37,8 @@ public class ChatController {
         }
         redisPublisher.publish(chatRoomRepository.getTopic(message.getRoomId()), message);
     }
+    @PostMapping("/api/v1/chatroom")
+    public void createChatRoom(ChatRoom chatRoom) {
+        chatService.saveChatRoom(chatRoom);
+    }
 }

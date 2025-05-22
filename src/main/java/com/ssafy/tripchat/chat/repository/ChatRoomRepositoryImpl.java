@@ -2,20 +2,19 @@ package com.ssafy.tripchat.chat.repository;
 
 import com.ssafy.tripchat.chat.domain.ChatRoom;
 import com.ssafy.tripchat.chat.infrastructure.RedisSubscriber;
+import com.ssafy.tripchat.global.service.RedisCommon;
 import jakarta.annotation.PostConstruct;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Repository
@@ -23,8 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     public static final String CHAT_ROOM = "CHAT_ROOM";
 
-    @Qualifier("chatRoomRedisTemplate")
-    private final RedisTemplate<String, Object> redisTemplate;
+
+    private final RedisCommon redis;
+    private final RedisTemplate<String, String> redisTemplate;
     private final RedisMessageListenerContainer redisMessageListener;
     private final RedisSubscriber redisSubscriber;
     private HashOperations<String, String, ChatRoom> opsHashChatRoom;
@@ -36,7 +36,8 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
         opsHashChatRoom = redisTemplate.opsForHash();
 
         //CHAT_ROOMS에 있는 모든 방을 가져와서 채널 토픽을 생성
-        Set<Object> roomIds = redisTemplate.opsForHash().entries(CHAT_ROOM).keySet();
+        Set<String> roomIds = null;
+//        Set<String> roomIds = redisTemplate.opsForSet().members(CHAT_ROOM);
 
         if (roomIds != null) {
             for (Object roomIdObj : roomIds) {
@@ -48,6 +49,11 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
         }
 
         log.info("ChatRoomRepository initialized");
+    }
+
+    public ChatRoom save(ChatRoom chatRoom) {
+        redis.putInHash(CHAT_ROOM, chatRoom.getRoomId(), chatRoom);
+        return chatRoom;
     }
 
     public List<ChatRoom> findAllRoom() {

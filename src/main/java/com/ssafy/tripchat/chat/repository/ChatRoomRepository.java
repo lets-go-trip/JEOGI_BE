@@ -13,4 +13,6 @@ public interface ChatRoomRepository {
     ChatRoom findRoomById(String roomId);
 
     List<ChatRoom> findAllRoom();
+
+    ChatRoom save(ChatRoom chatRoom);
 }
