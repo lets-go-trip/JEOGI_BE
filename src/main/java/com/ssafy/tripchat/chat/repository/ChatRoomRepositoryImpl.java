@@ -52,7 +52,7 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     }
 
     public ChatRoom save(ChatRoom chatRoom) {
-        redis.putInHash(CHAT_ROOM, chatRoom.getRoomId(), chatRoom);
+        redis.putInHash(CHAT_ROOM, String.valueOf(chatRoom.getRoomId()), chatRoom);
         return chatRoom;
     }
 
@@ -66,27 +66,27 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     }
 
     // 서버가 채팅방 공유를 위해 redis hash에 저장
-    public ChatRoom createChatRoom(String name) {
-        ChatRoom chatRoom = ChatRoom.create(name);
-        opsHashChatRoom.put(CHAT_ROOM, chatRoom.getRoomId(), chatRoom);
+    public ChatRoom createChatRoom(Integer roomId, String name) {
+        ChatRoom chatRoom = ChatRoom.create(roomId, name);
+        opsHashChatRoom.put(CHAT_ROOM, String.valueOf(chatRoom.getRoomId()), chatRoom);
 
         return chatRoom;
     }
 
-    public void enterChatRoom(String roomId) {
+    public void enterChatRoom(Integer roomId) {
         ChannelTopic topic = topics.get(roomId);
 
         if (topic == null) {
-            topic = new ChannelTopic(roomId);
+            topic = new ChannelTopic(roomId.toString());
             redisMessageListener.addMessageListener(redisSubscriber, topic);
-            topics.put(roomId, topic);
+            topics.put(roomId.toString(), topic);
         } else {
             log.info("{} 라는 이름으로 이미 존재하는 방이 있습니다.", roomId);
         }
     }
 
-    public ChannelTopic getTopic(String roomId) {
-        ChannelTopic topic = topics.get(roomId);
+    public ChannelTopic getTopic(Integer roomId) {
+        ChannelTopic topic = topics.get(roomId.toString());
 
         if (topic == null) {
             log.error("Topic not found for roomId={}", roomId);

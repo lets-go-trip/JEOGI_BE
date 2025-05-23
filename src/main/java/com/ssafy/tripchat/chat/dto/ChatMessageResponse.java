@@ -8,7 +8,7 @@ import lombok.Getter;
 public class ChatMessageResponse {
     private int id;
     private Type type;
-    private String roomId;
+    private Integer roomId;
     private String sender;
     private String message;
 
