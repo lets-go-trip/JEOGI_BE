@@ -10,10 +10,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        // TODO: 클라이언트 서버 확정 후 수정예정
+        // 프론트엔드 서버 URL 명시적으로 추가
         registry.addMapping("/**")
-                .allowedOriginPatterns("*")
-                .allowedMethods("GET", "POST", "DELETE", "PUT", "OPTIONS")
-                .allowCredentials(true);
+                .allowedOrigins("http://localhost:5173")  // 프론트엔드 서버 URL
+                .allowedOriginPatterns("*")  // 개발 중에는 모든 오리진 허용
+                .allowedMethods("GET", "POST", "DELETE", "PUT", "OPTIONS", "PATCH")
+                .allowedHeaders("Authorization", "Content-Type", "Accept", "*")
+                .exposedHeaders("Authorization")
+                .allowCredentials(true)
+                .maxAge(3600); // preflight 요청 캐싱 시간 (1시간)
     }
 }

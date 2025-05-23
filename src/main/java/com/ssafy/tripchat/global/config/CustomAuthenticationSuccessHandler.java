@@ -38,7 +38,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
         log.info("Login successful for user: {}", authentication.getName());
 
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write("Login successful");
     }
 
 }
