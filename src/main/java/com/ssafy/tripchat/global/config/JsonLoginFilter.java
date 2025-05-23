@@ -4,20 +4,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.tripchat.global.security.domain.LoginRequest;
 import com.ssafy.tripchat.global.security.domain.MemberPrincipal;
 import com.ssafy.tripchat.global.security.dto.response.LoginResponse;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@Slf4j
 public class JsonLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final AuthenticationSuccessHandler successHandler = new CustomAuthenticationSuccessHandler();
 
     public JsonLoginFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
@@ -51,13 +56,16 @@ public class JsonLoginFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     private void success(HttpServletRequest req, HttpServletResponse res,
-                         Authentication auth) throws IOException {
+                         Authentication auth) throws IOException, ServletException {
         MemberPrincipal member = ((MemberPrincipal) auth.getPrincipal());
 
+        successHandler.onAuthenticationSuccess(req, res, auth);
         res.setContentType("application/json;charset=UTF-8");
         res.setStatus(HttpStatus.OK.value());
+
         LoginResponse response = LoginResponse.success(member);
         objectMapper.writeValue(res.getWriter(), response);
+
     }
 
     private void failure(HttpServletRequest req, HttpServletResponse res,

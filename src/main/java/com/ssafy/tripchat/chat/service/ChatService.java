@@ -1,0 +1,19 @@
+package com.ssafy.tripchat.chat.service;
+
+import com.ssafy.tripchat.chat.domain.ChatMessage;
+import com.ssafy.tripchat.chat.domain.ChatRoom;
+import com.ssafy.tripchat.chat.dto.ChatMessageListResponse;
+
+public interface ChatService {
+
+    ChatRoom saveChatRoom(ChatRoom chatRoom);
+
+    ChatMessageListResponse fetchAllByRoomId(String roomId);
+
+    ChatMessageListResponse fetchWithCursorByRoomId(String roomId, int cursor);
+
+    void sendMessage(ChatMessage message);
+
+    ChatMessageListResponse fetchMessagesFromCache(String roomId);
+
+}
