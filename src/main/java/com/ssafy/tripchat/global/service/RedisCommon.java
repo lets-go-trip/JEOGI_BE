@@ -2,6 +2,9 @@ package com.ssafy.tripchat.global.service;
 
 import com.google.gson.Gson;
 import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,5 +74,21 @@ public class RedisCommon {
 
     public void removeToListRight(String key) {
         template.opsForList().rightPop(key);
+    }
+
+    public void expire(String key, Duration duration) {
+        template.expire(key, duration);
+    }
+
+    public <T> List<T> getAllList(String key, Class<T> clazz) {
+        List<String> raw = template.opsForList().range(key, 0, -1);
+
+        if (raw == null || raw.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return raw.stream()
+                .map(jsonValue -> gson.fromJson(jsonValue, clazz))
+                .collect(Collectors.toList());
     }
 }

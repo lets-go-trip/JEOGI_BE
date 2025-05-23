@@ -1,29 +1,19 @@
 package com.ssafy.tripchat.chat.service;
 
-import com.ssafy.tripchat.chat.domain.ChatRoom;
 import com.ssafy.tripchat.chat.domain.ChatMessage;
+import com.ssafy.tripchat.chat.domain.ChatRoom;
 import com.ssafy.tripchat.chat.dto.ChatMessageListResponse;
-import com.ssafy.tripchat.chat.repository.ChatMessageRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+public interface ChatService {
 
-@Service
-@RequiredArgsConstructor
-public class ChatService {
+    ChatRoom saveChatRoom(ChatRoom chatRoom);
 
-    private final ChatMessageRepository chatMessageRepository;
+    ChatMessageListResponse fetchAllByRoomId(String roomId);
 
-    public ChatMessageListResponse fetchAllByRoomId(String roomId) {
-        List<ChatMessage> chatMessageList = chatMessageRepository.findAllByRoomId(roomId);
-        return new ChatMessageListResponse(chatMessageList);
-    }
+    ChatMessageListResponse fetchWithCursorByRoomId(String roomId, int cursor);
 
-    public ChatMessageListResponse fetchWithCursorByRoomId(String roomId, int cursor) {
-        if (cursor <= 0) return new ChatMessageListResponse(new ArrayList<ChatMessage>());
-        List<ChatMessage> chatMessageList = chatMessageRepository.findTop20ByRoomIdAndIdLessThanOrderByIdDesc(roomId, cursor);
-        return new ChatMessageListResponse(chatMessageList);
-    }
+    void sendMessage(ChatMessage message);
+
+    ChatMessageListResponse fetchMessagesFromCache(String roomId);
+
 }
