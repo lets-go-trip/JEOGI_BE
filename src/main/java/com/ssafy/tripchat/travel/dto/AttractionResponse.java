@@ -1,13 +1,9 @@
 package com.ssafy.tripchat.travel.dto;
 
-import com.ssafy.tripchat.reservation.domain.ParkingLots;
-import com.ssafy.tripchat.travel.domain.*;
-import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-
-import java.util.ArrayList;
+import com.ssafy.tripchat.travel.domain.Attractions;
+import com.ssafy.tripchat.travel.domain.Images;
 import java.util.List;
+import lombok.Getter;
 
 @Getter
 public class AttractionResponse {
@@ -23,9 +19,9 @@ public class AttractionResponse {
     private double longitude;
     private String tel;
     private String address;
-    //private String overview;
 
     public AttractionResponse(Attractions attractions) {
+        this.id = attractions.getId();
         this.metropolitanCode = attractions.getMetropolitan().getCode();
         this.contentTypes = attractions.getContentTypes().getId();
         this.localCode = attractions.getLocal().getId();
