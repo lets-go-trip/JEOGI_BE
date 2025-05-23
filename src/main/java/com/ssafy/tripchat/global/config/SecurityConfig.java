@@ -31,7 +31,9 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authMgr) throws Exception {
         http.csrf(csrf -> csrf.disable()).httpBasic(httpBasicSpec -> httpBasicSpec.disable())
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/**").permitAll() // 모든 OPTIONS 요청 허용
+                        .anyRequest().permitAll())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(httpBasic -> httpBasic.disable())
                 // 로그아웃 처리
