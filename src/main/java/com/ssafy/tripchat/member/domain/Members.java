@@ -35,4 +35,7 @@ public class Members {
     @Column
     private String nickname;
 
+    @Column
+    private String role;
+
 }

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatRestController {
     private final ChatService chatService;
 
-    @PreAuthorize("USER")
+    //@PreAuthorize("USER")
     @LogExecutionTime
     @GetMapping("/{roomId}/{cursor}")
     public ResponseEntity<?> fetchByRoomId(@PathVariable(name = "roomId") String roomId,

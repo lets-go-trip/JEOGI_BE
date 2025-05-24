@@ -1,12 +1,10 @@
 package com.ssafy.tripchat.member.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member {
@@ -14,4 +12,5 @@ public class Member {
 	private String email;
 	private String password;
 	private String username;
+	private String role;
 }

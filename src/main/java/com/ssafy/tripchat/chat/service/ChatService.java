@@ -2,6 +2,7 @@ package com.ssafy.tripchat.chat.service;
 
 import com.ssafy.tripchat.chat.domain.ChatMessage;
 import com.ssafy.tripchat.chat.domain.ChatRoom;
+import com.ssafy.tripchat.chat.dto.ChatMessageIncoming;
 import com.ssafy.tripchat.chat.dto.ChatMessageListResponse;
 
 public interface ChatService {
@@ -16,4 +17,5 @@ public interface ChatService {
 
     ChatMessageListResponse fetchMessagesFromCache(String roomId);
 
+    ChatMessage processMessage(ChatMessageIncoming messageIncoming);
 }

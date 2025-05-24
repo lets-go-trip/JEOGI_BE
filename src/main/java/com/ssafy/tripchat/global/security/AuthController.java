@@ -4,6 +4,7 @@ import com.ssafy.tripchat.global.security.domain.LoginRequest;
 import com.ssafy.tripchat.global.security.domain.RegisterRequest;
 import com.ssafy.tripchat.global.security.domain.UserResponse;
 import com.ssafy.tripchat.member.domain.Members;
+import com.ssafy.tripchat.member.dto.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
