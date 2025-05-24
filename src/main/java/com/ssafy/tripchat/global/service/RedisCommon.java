@@ -2,9 +2,13 @@ package com.ssafy.tripchat.global.service;
 
 import com.google.gson.Gson;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.google.gson.GsonBuilder;
+import com.ssafy.tripchat.chat.infrastructure.LocalDateTimeAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +21,8 @@ import org.springframework.stereotype.Service;
 public class RedisCommon {
 
     private final RedisTemplate<String, String> template;
-    private final Gson gson;
+    private final Gson gson = new GsonBuilder()
+        .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter()).create();
 
     //TODO 수정하기
     @Value("50m")
