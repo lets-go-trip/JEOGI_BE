@@ -6,6 +6,8 @@ import com.ssafy.tripchat.chat.domain.Type;
 import com.ssafy.tripchat.chat.repository.ChatRoomRepository;
 import com.ssafy.tripchat.chat.service.ChatService;
 import com.ssafy.tripchat.common.aop.LogExecutionTime;
+import com.ssafy.tripchat.common.exception.InvalidRequestException;
+import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -21,7 +23,12 @@ public class ChatController {
 
     @LogExecutionTime
     @MessageMapping("/chat/message")
-    public void message(ChatMessage message) {
+    public void message(ChatMessage message, Principal principal) {
+        log.info("Principal 정보 출력하기 : {}", principal.getName());
+
+        if (principal == null) {
+            throw new InvalidRequestException("인증되지 않은 사용자입니다.");
+        }
         // TODO: getSender().getNickname() 부분 적절한지 검토하기
         if (Type.ENTER.equals(message.getType())) {
             //TODO 존재하지 않는 채팅방인 경우 생성하고 들어간다.
