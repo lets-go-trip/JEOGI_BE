@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ParkingSpaceReservationRepository {
+    
     List<Reservations> findReservationsByMemberId(int memberId);
 
     Optional<Reservations> findReservationById(int reservationId);

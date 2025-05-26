@@ -37,7 +37,7 @@ public class Attractions {
 
     private String title;
 
-    @OneToMany(mappedBy = "url")
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Images> imgUrl;
 
     @OneToOne(mappedBy = "attraction", cascade = CascadeType.ALL, orphanRemoval = true)

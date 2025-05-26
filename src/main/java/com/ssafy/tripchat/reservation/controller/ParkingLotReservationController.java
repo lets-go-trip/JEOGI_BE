@@ -42,7 +42,7 @@ public class ParkingLotReservationController {
 
         ParkingReservationResponse response = parkingLotReservationService.reserveParkingLot(parkingLotId, memberId,
                 request);
-        URI location = URI.create("/api/v1/parking-reservations/" + response.getParkingLotId());
+        URI location = URI.create("/api/v1/parking-reservations/me");
 
         return ResponseEntity.created(location).body(response);
     }
