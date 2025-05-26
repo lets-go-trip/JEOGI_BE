@@ -3,7 +3,6 @@ package com.ssafy.tripchat.chat.service;
 import com.ssafy.tripchat.chat.domain.ChatMessage;
 import com.ssafy.tripchat.chat.domain.ChatRoom;
 import com.ssafy.tripchat.chat.domain.Type;
-import com.ssafy.tripchat.chat.dto.ChatMessageIncoming;
 import com.ssafy.tripchat.chat.dto.ChatMessageListResponse;
 import com.ssafy.tripchat.chat.infrastructure.RedisMessageCacheManager;
 import com.ssafy.tripchat.chat.infrastructure.RedisPublisher;
@@ -61,13 +60,13 @@ public class ChatServiceImpl implements ChatService {
         return new ChatMessageListResponse(chatMessageList);
     }
 
-    public ChatMessage processMessage(ChatMessageIncoming messageIncoming) {
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setRoomId(messageIncoming.getRoomId());
-        chatMessage.setSender(messageIncoming.getSender());
-        chatMessage.setSenderId(messageIncoming.getSenderId());
-        chatMessage.setType(messageIncoming.getType());
-        chatMessage.setMessage(messageIncoming.getMessage());
-        return chatMessage;
-    }
+//    public ChatMessage processMessage(ChatMessageIncoming messageIncoming) {
+//        ChatMessage chatMessage = new ChatMessage();
+//        chatMessage.setRoomId(messageIncoming.getRoomId());
+//        chatMessage.setSender(messageIncoming.getSender());
+//        chatMessage.setSenderId(messageIncoming.getSenderId());
+//        chatMessage.setType(messageIncoming.getType());
+//        chatMessage.setMessage(messageIncoming.getMessage());
+//        return chatMessage;
+//    }
 }
