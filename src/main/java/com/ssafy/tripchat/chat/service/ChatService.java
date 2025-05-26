@@ -17,5 +17,4 @@ public interface ChatService {
 
     ChatMessageListResponse fetchMessagesFromCache(String roomId);
 
-    ChatMessage processMessage(ChatMessageIncoming messageIncoming);
 }

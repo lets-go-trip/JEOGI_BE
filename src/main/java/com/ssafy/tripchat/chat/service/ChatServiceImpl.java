@@ -61,13 +61,4 @@ public class ChatServiceImpl implements ChatService {
         return new ChatMessageListResponse(chatMessageList);
     }
 
-    public ChatMessage processMessage(ChatMessageIncoming messageIncoming) {
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setRoomId(messageIncoming.getRoomId());
-        chatMessage.setSender(messageIncoming.getSender());
-        chatMessage.setSenderId(messageIncoming.getSenderId());
-        chatMessage.setType(messageIncoming.getType());
-        chatMessage.setMessage(messageIncoming.getMessage());
-        return chatMessage;
-    }
 }
