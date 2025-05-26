@@ -30,13 +30,13 @@ public class AttractionService {
     QAttractions attractions = QAttractions.attractions;
 
     public AttractionListResponse searchByCondition(AttractionSearchCondition cond) {
-
+        System.out.println(cond);
         long start = System.currentTimeMillis();
 
-        int region = cond.getRegionCode() == null ? 0 : cond.getRegionCode();
-        cond.setMetropolitanCode(region / 1000);
-
-        cond.setLocalCode(region % 1000);
+//        int region = cond.getRegionCode() == null ? 0 : cond.getRegionCode();
+//        cond.setMetropolitanCode(region / 1000);
+//
+//        cond.setLocalCode(region % 1000);
 
         List<Attractions> result = queryFactory
                 .selectFrom(attractions)
@@ -83,7 +83,7 @@ public class AttractionService {
     }
 
     private BooleanExpression eqLocalCode(Integer localCode) {
-        return localCode != 0 ? attractions.local.code.eq(localCode) : null;
+        return localCode != 0 ? attractions.local.id.eq(localCode) : null;
     }
 
     private BooleanExpression eqContentTypes(Integer contentTypes) {
