@@ -3,7 +3,6 @@ package com.ssafy.tripchat.chat.service;
 import com.ssafy.tripchat.chat.domain.ChatMessage;
 import com.ssafy.tripchat.chat.domain.ChatRoom;
 import com.ssafy.tripchat.chat.domain.Type;
-import com.ssafy.tripchat.chat.dto.ChatMessageIncoming;
 import com.ssafy.tripchat.chat.dto.ChatMessageListResponse;
 import com.ssafy.tripchat.chat.infrastructure.RedisMessageCacheManager;
 import com.ssafy.tripchat.chat.infrastructure.RedisPublisher;
@@ -60,5 +59,4 @@ public class ChatServiceImpl implements ChatService {
         List<ChatMessage> chatMessageList = redisMessageCacheManager.getMessages(roomId, ChatMessage.class);
         return new ChatMessageListResponse(chatMessageList);
     }
-
 }
