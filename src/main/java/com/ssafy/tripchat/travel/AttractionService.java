@@ -5,15 +5,17 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.tripchat.common.exception.InvalidRequestException;
 import com.ssafy.tripchat.travel.domain.Attractions;
 import com.ssafy.tripchat.travel.domain.QAttractions;
+import com.ssafy.tripchat.travel.dto.AttractionListResponse;
+import com.ssafy.tripchat.travel.dto.AttractionResponse;
+import com.ssafy.tripchat.travel.dto.AttractionSearchCondition;
+import com.ssafy.tripchat.travel.dto.ContentTypesListResponse;
+import com.ssafy.tripchat.travel.dto.LocalListResponse;
 import com.ssafy.tripchat.travel.repository.AttractionsRepository;
-import com.ssafy.tripchat.travel.dto.*;
-import java.util.List;
 import com.ssafy.tripchat.travel.repository.ContentTypesRepository;
 import com.ssafy.tripchat.travel.repository.LocalsRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import javax.swing.text.AbstractDocument;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +46,6 @@ public class AttractionService {
                 .join(attractions.metropolitan).fetchJoin()
                 .join(attractions.local).fetchJoin()
                 .join(attractions.contentTypes).fetchJoin()
-                .leftJoin(attractions.imgUrl).fetchJoin()
                 .leftJoin(attractions.parkingLot).fetchJoin()
                 .where(
                         eqMetropolitanCode(cond.getMetropolitanCode()),
