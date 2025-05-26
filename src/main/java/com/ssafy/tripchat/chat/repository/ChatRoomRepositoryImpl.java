@@ -52,7 +52,7 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     }
 
     public ChatRoom save(ChatRoom chatRoom) {
-        redis.putInHash(CHAT_ROOM, chatRoom.getRoomId(), chatRoom);
+        redis.putInHash(CHAT_ROOM, chatRoom.getId(), chatRoom);
         return chatRoom;
     }
 
@@ -68,7 +68,7 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     // 서버가 채팅방 공유를 위해 redis hash에 저장
     public ChatRoom createChatRoom(String name) {
         ChatRoom chatRoom = ChatRoom.create(name);
-        opsHashChatRoom.put(CHAT_ROOM, chatRoom.getRoomId(), chatRoom);
+        opsHashChatRoom.put(CHAT_ROOM, chatRoom.getId(), chatRoom);
 
         return chatRoom;
     }

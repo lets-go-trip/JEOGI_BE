@@ -27,7 +27,7 @@ public class AttractionResponse {
         this.localCode = attractions.getLocal().getId();
         this.title = attractions.getTitle();
         this.imgUrl = attractions.getImgUrl();
-        this.parkingLotCount = attractions.getParkingLot().getTotalCount();
+        this.parkingLotCount = attractions.getParkingLot() == null ? 0 : attractions.getParkingLot().getTotalCount();
         this.latitude = attractions.getLatitude();
         this.longitude = attractions.getLongitude();
         this.tel = attractions.getTel();

@@ -13,12 +13,14 @@ public class MemberPrincipal implements UserDetails {
     private final int id;
     private final String username;
     private final String password;
+    private final String nickname;
     private final Collection<? extends GrantedAuthority> authorities;
 
     public MemberPrincipal(Members m) {
         this.id = m.getId();
         this.username = m.getUsername();
         this.password = m.getPassword();
+        this.nickname = m.getNickname();
 
         //TODO:: USER 하드코딩 동적으로 변경
         this.authorities = List.of(

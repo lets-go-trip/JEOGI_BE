@@ -3,6 +3,7 @@ package com.ssafy.tripchat.chat.controller;
 
 import com.ssafy.tripchat.chat.domain.ChatMessage;
 import com.ssafy.tripchat.chat.domain.Type;
+import com.ssafy.tripchat.chat.dto.ChatMessageIncoming;
 import com.ssafy.tripchat.chat.repository.ChatRoomRepository;
 import com.ssafy.tripchat.chat.service.ChatService;
 import com.ssafy.tripchat.common.aop.LogExecutionTime;
@@ -20,17 +21,16 @@ public class ChatController {
     private final ChatService chatService;
     private final ChatRoomRepository chatRoomRepository;
 
-    @PreAuthorize("USER")
+    //@PreAuthorize("USER")
     @LogExecutionTime
     @MessageMapping("/chat/message")
-    public void message(ChatMessage message) {
-        // TODO: getSender().getNickname() 부분 적절한지 검토하기
+    public void message(ChatMessageIncoming messageIncoming) {
+        ChatMessage message = chatService.processMessage(messageIncoming);
         if (Type.ENTER.equals(message.getType())) {
             chatRoomRepository.enterChatRoom(message.getRoomId());
             message.setMessage(message.getSender() + "님이 입장하셨습니다.");
-            log.info("User {} entered room {}", message.getSender(), message.getRoomId());
+            log.info("{}: User {} entered room {}", message.getCreatedAt(), message.getSender(), message.getRoomId());
         }
-
         chatService.sendMessage(message);
     }
 }

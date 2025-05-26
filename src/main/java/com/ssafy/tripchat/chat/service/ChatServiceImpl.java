@@ -3,6 +3,7 @@ package com.ssafy.tripchat.chat.service;
 import com.ssafy.tripchat.chat.domain.ChatMessage;
 import com.ssafy.tripchat.chat.domain.ChatRoom;
 import com.ssafy.tripchat.chat.domain.Type;
+import com.ssafy.tripchat.chat.dto.ChatMessageIncoming;
 import com.ssafy.tripchat.chat.dto.ChatMessageListResponse;
 import com.ssafy.tripchat.chat.infrastructure.RedisMessageCacheManager;
 import com.ssafy.tripchat.chat.infrastructure.RedisPublisher;
@@ -40,7 +41,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public ChatMessageListResponse fetchWithCursorByRoomId(String roomId, int cursor) {
         if (cursor <= 0) {
-            return new ChatMessageListResponse(new ArrayList<ChatMessage>());
+            return new ChatMessageListResponse(new ArrayList<>());
         }
         List<ChatMessage> chatMessageList = chatMessageRepository.findTop20ByRoomIdAndIdLessThanOrderByIdDesc(roomId,
                 cursor);
@@ -58,5 +59,15 @@ public class ChatServiceImpl implements ChatService {
     public ChatMessageListResponse fetchMessagesFromCache(String roomId) {
         List<ChatMessage> chatMessageList = redisMessageCacheManager.getMessages(roomId, ChatMessage.class);
         return new ChatMessageListResponse(chatMessageList);
+    }
+
+    public ChatMessage processMessage(ChatMessageIncoming messageIncoming) {
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setRoomId(messageIncoming.getRoomId());
+        chatMessage.setSender(messageIncoming.getSender());
+        chatMessage.setSenderId(messageIncoming.getSenderId());
+        chatMessage.setType(messageIncoming.getType());
+        chatMessage.setMessage(messageIncoming.getMessage());
+        return chatMessage;
     }
 }

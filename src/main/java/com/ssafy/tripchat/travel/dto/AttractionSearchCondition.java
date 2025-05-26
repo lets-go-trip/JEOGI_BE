@@ -19,9 +19,9 @@ public class AttractionSearchCondition {
 	// regionCode = metropolitanCode * 1000 + localCode
 	private Integer regionCode;
 	
-	private Integer metropolitanCode;
-	private Integer localCode;
-	private Integer contentTypeId;
+	private int metropolitanCode;
+	private int localCode;
+	private int contentTypeId;
 	
 	private Boolean isRangeSearch;
 
