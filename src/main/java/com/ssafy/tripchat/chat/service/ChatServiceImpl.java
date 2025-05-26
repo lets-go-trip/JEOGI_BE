@@ -33,13 +33,13 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public ChatMessageListResponse fetchAllByRoomId(String roomId) {
+    public ChatMessageListResponse fetchAllByRoomId(Integer roomId) {
         List<ChatMessage> chatMessageList = chatMessageRepository.findAllByRoomId(roomId);
         return new ChatMessageListResponse(chatMessageList);
     }
 
     @Override
-    public ChatMessageListResponse fetchWithCursorByRoomId(String roomId, int cursor) {
+    public ChatMessageListResponse fetchWithCursorByRoomId(Integer roomId, int cursor) {
         if (cursor <= 0) {
             return new ChatMessageListResponse(new ArrayList<>());
         }
@@ -51,7 +51,7 @@ public class ChatServiceImpl implements ChatService {
     public void sendMessage(ChatMessage message) {
         if (message.getType().equals(Type.TALK)) {
             chatMessageRepository.save(message);
-            redisMessageCacheManager.addMessage(message.getRoomId(), message);
+            redisMessageCacheManager.addMessage(message.getRoomId().toString(), message);
         }
         redisPublisher.publish(chatRoomRepository.getTopic(message.getRoomId()), message);
     }

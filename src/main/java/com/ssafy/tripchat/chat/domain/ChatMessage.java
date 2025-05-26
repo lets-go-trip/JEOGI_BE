@@ -1,12 +1,10 @@
 package com.ssafy.tripchat.chat.domain;
 
+import java.io.Serializable;
 import com.ssafy.tripchat.chat.dto.ChatMessageIncoming;
 import com.ssafy.tripchat.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.io.Serializable;
-
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -22,9 +20,8 @@ public class ChatMessage extends BaseEntity implements Serializable {
 
     @Embedded
     private Type type;
-
-    //TODO: roomId integer 아니었나?
-    private String roomId;
+    
+    private Integer roomId;
 
     private int senderId;
 

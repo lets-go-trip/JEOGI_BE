@@ -20,22 +20,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatRestController {
     private final ChatService chatService;
 
-    //@PreAuthorize("USER")
+
+    @PreAuthorize("hasRole('USER')")
     @LogExecutionTime
     @GetMapping("/{roomId}/{cursor}")
-    public ResponseEntity<?> fetchByRoomId(@PathVariable(name = "roomId") String roomId,
+    public ResponseEntity<?> fetchByRoomId(@PathVariable(name = "roomId") Integer roomId,
                                            @PathVariable(name = "cursor") String cursor) {
+        log.info("fetchByRoomId called with roomId: {}, cursor: {}", roomId, cursor);
         if (cursor.equals("latest")) {
-            ChatMessageListResponse result = chatService.fetchMessagesFromCache(roomId);
+            ChatMessageListResponse result = chatService.fetchMessagesFromCache(roomId.toString());
             return ResponseEntity.status(HttpStatus.OK).body(result);
         }
 
         log.info("cursor = {} roomId = {}", cursor, roomId);
-        //TODO : redis에서 캐싱된 데이터를 가져오고 부족한건 DB에서 가져오기
         ChatMessageListResponse result = chatService.fetchWithCursorByRoomId(roomId, Integer.parseInt(cursor));
         return ResponseEntity.status(HttpStatus.OK).body(result);
+
     }
 }
-
-
-

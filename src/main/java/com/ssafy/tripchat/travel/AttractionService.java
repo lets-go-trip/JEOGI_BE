@@ -2,12 +2,12 @@ package com.ssafy.tripchat.travel;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.ssafy.tripchat.common.exception.InvalidRequestException;
 import com.ssafy.tripchat.travel.domain.Attractions;
 import com.ssafy.tripchat.travel.domain.QAttractions;
+import com.ssafy.tripchat.travel.repository.AttractionsRepository;
 import com.ssafy.tripchat.travel.dto.*;
-
 import java.util.List;
-
 import com.ssafy.tripchat.travel.repository.ContentTypesRepository;
 import com.ssafy.tripchat.travel.repository.LocalsRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class AttractionService {
     private static final double KM_TO_LATITUDE = 0.009;
     private static final double KM_TO_LONGITUDE = 0.011;
 
-    // private final AttractionsRepository attractionsRepository;
+    private final AttractionsRepository attractionsRepository;
     private final JPAQueryFactory queryFactory;
     private final LocalsRepository localsRepository;
     private final ContentTypesRepository contentTypesRepository;
@@ -69,6 +69,13 @@ public class AttractionService {
 
         double elapsed = (System.currentTimeMillis() - start) / 1000.0;
         return new AttractionListResponse(finalList, elapsed);
+    }
+
+    public AttractionResponse getAttractionInfo(int id) {
+        Attractions attraction = attractionsRepository.findById(id)
+                .orElseThrow(() -> new InvalidRequestException("존재하지 않는 장소입니다."));
+
+        return new AttractionResponse(attraction);
     }
 
     private BooleanExpression eqMetropolitanCode(Integer metropolitanCode) {

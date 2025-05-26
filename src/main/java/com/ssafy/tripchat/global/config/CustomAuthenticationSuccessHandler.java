@@ -28,8 +28,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
                 Field passwordField = MemberPrincipal.class.getDeclaredField("password");
                 passwordField.setAccessible(true);
                 passwordField.set(memberPrincipal, null);
-
-                log.info("비밀번호 변경했어요!!! : {}", memberPrincipal.getPassword());
+                
             } catch (Exception e) {
                 throw new RuntimeException("Failed to nullify password", e);
             }

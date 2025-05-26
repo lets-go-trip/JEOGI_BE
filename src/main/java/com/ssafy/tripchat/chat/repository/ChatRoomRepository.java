@@ -6,9 +6,9 @@ import org.springframework.data.redis.listener.ChannelTopic;
 
 public interface ChatRoomRepository {
 
-    ChannelTopic getTopic(String roomId);
+    ChannelTopic getTopic(Integer roomId);
 
-    void enterChatRoom(String roomId);
+    void enterChatRoom(Integer roomId);
 
     ChatRoom findRoomById(String roomId);
 

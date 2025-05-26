@@ -9,9 +9,9 @@ public interface ChatService {
 
     ChatRoom saveChatRoom(ChatRoom chatRoom);
 
-    ChatMessageListResponse fetchAllByRoomId(String roomId);
+    ChatMessageListResponse fetchAllByRoomId(Integer roomId);
 
-    ChatMessageListResponse fetchWithCursorByRoomId(String roomId, int cursor);
+    ChatMessageListResponse fetchWithCursorByRoomId(Integer roomId, int cursor);
 
     void sendMessage(ChatMessage message);
 

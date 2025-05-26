@@ -32,8 +32,9 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authMgr) throws Exception {
         http.csrf(csrf -> csrf.disable()).httpBasic(httpBasicSpec -> httpBasicSpec.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/**").permitAll() // 모든 OPTIONS 요청 허용
-                        .anyRequest().permitAll())
+                        .requestMatchers("/api/auth/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/api/chat/**").hasRole("USER")
+                        .anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(httpBasic -> httpBasic.disable())
                 // 로그아웃 처리
