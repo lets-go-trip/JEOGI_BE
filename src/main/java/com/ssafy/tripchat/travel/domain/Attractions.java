@@ -8,9 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,8 +35,8 @@ public class Attractions {
 
     private String title;
 
-    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Images> imgUrl;
+    //    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL, orphanRemoval = true)
+    private String url;
 
     @OneToOne(mappedBy = "attraction", cascade = CascadeType.ALL, orphanRemoval = true)
     private ParkingLots parkingLot;
@@ -50,13 +48,13 @@ public class Attractions {
     private String overview;
 
     public Attractions(Metropolitans metropolitan, ContentTypes contentTypes, Locals local, String title,
-                       List<Images> imgUrl, ParkingLots parkingLot, double latitude, double longitude, String tel,
+                       String imgUrl, ParkingLots parkingLot, double latitude, double longitude, String tel,
                        String address, String overview) {
         this.metropolitan = metropolitan;
         this.contentTypes = contentTypes;
         this.local = local;
         this.title = title;
-        this.imgUrl = imgUrl;
+        this.url = imgUrl;
         this.parkingLot = parkingLot;
         this.latitude = latitude;
         this.longitude = longitude;

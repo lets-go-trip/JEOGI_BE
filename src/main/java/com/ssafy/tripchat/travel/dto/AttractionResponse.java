@@ -1,8 +1,6 @@
 package com.ssafy.tripchat.travel.dto;
 
 import com.ssafy.tripchat.travel.domain.Attractions;
-import com.ssafy.tripchat.travel.domain.Images;
-import java.util.List;
 import lombok.Getter;
 
 @Getter
@@ -26,7 +24,7 @@ public class AttractionResponse {
         this.contentTypes = attractions.getContentTypes().getId();
         this.localCode = attractions.getLocal().getId();
         this.title = attractions.getTitle();
-        this.imgUrl = extractImage(attractions.getImgUrl());
+        this.imgUrl = attractions.getUrl();
         this.parkingLotCount = attractions.getParkingLot() == null ? 0 : attractions.getParkingLot().getTotalCount();
         this.latitude = attractions.getLatitude();
         this.longitude = attractions.getLongitude();
@@ -35,10 +33,10 @@ public class AttractionResponse {
         //this.overview = attractions.getOverview();
     }
 
-    private String extractImage(List<Images> img) {
-        if (img == null || img.isEmpty()) {
-            return null;
-        }
-        return img.get(0).getUrl();
-    }
+//    private String extractImage(List<Images> img) {
+//        if (img == null || img.isEmpty()) {
+//            return null;
+//        }
+//        return img.get(0).getUrl();
+//    }
 }
