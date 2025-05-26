@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatRestController {
     private final ChatService chatService;
 
+
     @PreAuthorize("hasRole('USER')")
     @LogExecutionTime
     @GetMapping("/{roomId}/{cursor}")

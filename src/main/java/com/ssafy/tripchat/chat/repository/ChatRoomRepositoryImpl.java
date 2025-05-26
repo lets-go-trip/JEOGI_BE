@@ -66,10 +66,10 @@ public class ChatRoomRepositoryImpl implements ChatRoomRepository {
     }
 
     // 서버가 채팅방 공유를 위해 redis hash에 저장
+
     public ChatRoom createChatRoom(Integer roomId, String name) {
         ChatRoom chatRoom = ChatRoom.create(roomId, name);
         opsHashChatRoom.put(CHAT_ROOM, String.valueOf(chatRoom.getRoomId()), chatRoom);
-
         return chatRoom;
     }
 

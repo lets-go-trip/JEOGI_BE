@@ -3,6 +3,7 @@ package com.ssafy.tripchat.chat.controller;
 
 import com.ssafy.tripchat.chat.domain.ChatMessage;
 import com.ssafy.tripchat.chat.domain.Type;
+import com.ssafy.tripchat.chat.dto.ChatMessageIncoming;
 import com.ssafy.tripchat.chat.repository.ChatRoomRepository;
 import com.ssafy.tripchat.chat.service.ChatService;
 import com.ssafy.tripchat.common.aop.LogExecutionTime;
@@ -29,14 +30,13 @@ public class ChatController {
         if (principal == null) {
             throw new InvalidRequestException("인증되지 않은 사용자입니다.");
         }
-        // TODO: getSender().getNickname() 부분 적절한지 검토하기
+  
         if (Type.ENTER.equals(message.getType())) {
             //TODO 존재하지 않는 채팅방인 경우 생성하고 들어간다.
             chatRoomRepository.enterChatRoom(message.getRoomId());
             message.setMessage(message.getSender() + "님이 입장하셨습니다.");
-            log.info("User {} entered room {}", message.getSender(), message.getRoomId());
+            log.info("{}: User {} entered room {}", message.getCreatedAt(), message.getSender(), message.getRoomId());
         }
-
         chatService.sendMessage(message);
     }
 }

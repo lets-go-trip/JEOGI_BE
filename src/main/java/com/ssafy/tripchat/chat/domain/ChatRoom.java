@@ -1,6 +1,9 @@
 package com.ssafy.tripchat.chat.domain;
 
+import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
+import com.ssafy.tripchat.travel.domain.Attractions;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
