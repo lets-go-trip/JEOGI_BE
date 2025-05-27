@@ -32,7 +32,6 @@ public class AttractionSearchController {
     }
     @GetMapping("/local")
     public ResponseEntity<?> fetchLocalList(@RequestParam(name="metropolitanCode") Integer metropolitanCode){
-    	System.out.println(metropolitanCode);
         LocalListResponse result = attractionService.findAllLocals(metropolitanCode);
         return ResponseEntity.ok(result);
     }

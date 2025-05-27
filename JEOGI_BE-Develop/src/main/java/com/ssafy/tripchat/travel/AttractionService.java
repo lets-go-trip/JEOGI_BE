@@ -9,6 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.tripchat.common.exception.InvalidRequestException;
 import com.ssafy.tripchat.travel.domain.Attractions;
 import com.ssafy.tripchat.travel.domain.QAttractions;
+import com.ssafy.tripchat.travel.dto.AttractionDetailResponse;
 import com.ssafy.tripchat.travel.dto.AttractionListResponse;
 import com.ssafy.tripchat.travel.dto.AttractionResponse;
 import com.ssafy.tripchat.travel.dto.AttractionSearchCondition;
@@ -51,13 +52,17 @@ public class AttractionService {
                 .join(attractions.contentTypes).fetchJoin()
                 .leftJoin(attractions.parkingLot).fetchJoin()
                 .where(
+                		containingStr(cond.getQuery()),
                         eqMetropolitanCode(cond.getMetropolitanCode()),
                         eqLocalCode(cond.getLocalCode()),
                         eqContentTypes(cond.getContentTypeId()),
                         betweenLatitude(cond.getIsRangeSearch(), cond.getLatitude(), cond.getRange()),
                         betweenLongitude(cond.getIsRangeSearch(), cond.getLongitude(), cond.getRange())
                 )
+                .limit(500)
                 .fetch();
+        
+        System.out.println(cond);
 
         List<AttractionResponse> dtoList = result.stream()
                 .map(AttractionResponse::new)
@@ -75,11 +80,10 @@ public class AttractionService {
         return new AttractionListResponse(finalList, elapsed);
     }
 
-    public AttractionResponse getAttractionInfo(int id) {
+    public AttractionDetailResponse getAttractionInfo(int id) {
         Attractions attraction = attractionsRepository.findById(id)
                 .orElseThrow(() -> new InvalidRequestException("존재하지 않는 장소입니다."));
-
-        return new AttractionResponse(attraction);
+        return new AttractionDetailResponse(attraction);
     }
 
     private BooleanExpression eqMetropolitanCode(Integer metropolitanCode) {
@@ -106,6 +110,10 @@ public class AttractionService {
             return null;
         }
         return isRangeSearch != null ? attractions.longitude.between(longitude - range, longitude + range) : null;
+    }
+    
+    private BooleanExpression containingStr(String str) {
+        return (str == null) || (str.length() <= 0) ? null : attractions.title.contains(str);
     }
 
     private static boolean isInRange(AttractionSearchCondition searchCondition, AttractionResponse target) {

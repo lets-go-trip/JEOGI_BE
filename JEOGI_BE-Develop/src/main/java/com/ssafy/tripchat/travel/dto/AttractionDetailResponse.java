@@ -5,7 +5,7 @@ import com.ssafy.tripchat.travel.domain.Attractions;
 import lombok.Getter;
 
 @Getter
-public class AttractionResponse {
+public class AttractionDetailResponse {
 
     private int id;
     private int metropolitanCode;
@@ -18,9 +18,9 @@ public class AttractionResponse {
     private double longitude;
     private String tel;
     private String address;
-    //private String overview;
+    private String overview;
 
-    public AttractionResponse(Attractions attractions) {
+    public AttractionDetailResponse(Attractions attractions) {
         this.id = attractions.getId();
         this.metropolitanCode = attractions.getMetropolitan().getCode();
         this.contentTypes = attractions.getContentTypes().getId();
@@ -32,7 +32,7 @@ public class AttractionResponse {
         this.longitude = attractions.getLongitude();
         this.tel = attractions.getTel();
         this.address = attractions.getAddress();
-        //this.overview = attractions.getOverview();
+        this.overview = attractions.getOverview();
     }
 
 //    private String extractImage(List<Images> img) {

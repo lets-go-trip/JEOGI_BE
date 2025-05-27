@@ -17,8 +17,9 @@ public class AttractionSearchCondition {
 
 	// 기존 지역별, 유형별 필터링
 	// regionCode = metropolitanCode * 1000 + localCode
-	private Integer regionCode;
-
+	//private Integer regionCode;
+	private String query;
+	
 	private int metropolitanCode;
 	private int localCode;
 	private int contentTypeId;

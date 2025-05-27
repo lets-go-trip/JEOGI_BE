@@ -62,7 +62,7 @@ public class ParkingLotReservationController {
     @DeleteMapping("/api/v1/parking-reservations/{reservationId}")
     public ResponseEntity<Void> deleteParkingReservation(
             @AuthenticationPrincipal MemberPrincipal principal,
-            @PathVariable int reservationId) {
+            @PathVariable(name = "reservationId") int reservationId) {
         int memberId = principal.getId();
         parkingSpaceReservationService.deleteReservation(memberId, reservationId);
         return ResponseEntity.noContent().build();
